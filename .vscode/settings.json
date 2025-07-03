@@ -1,0 +1,42 @@
+{
+    // --- Appearance Settings ---
+    // Sets the visual theme of VS Code. You can change this.
+    "workbench.colorTheme": "Default High Contrast",
+    "workbench.colorCustomizations": {},
+
+    // --- PHP Specific Settings (Most Important Part) ---
+    // This tells VS Code where your XAMPP PHP is located.
+    // Use double backslashes (\\) for the path.
+    "php.validate.executablePath": "D:\\xampp\\php\\php.exe",
+    
+    // Enables the built-in PHP linter (error checker).
+    "php.validate.enable": true,
+
+    // This checks your PHP code for errors every time you save the file.
+    "php.validate.run": "onSave",
+
+
+    // --- General Editor Quality-of-Life Settings (Highly Recommended) ---
+    // Automatically formats your code to be neat and readable when you save.
+    "editor.formatOnSave": true,
+
+    // Automatically wraps long lines of code so you don't have to scroll horizontally.
+    "editor.wordWrap": "on",
+
+    // Automatically saves your files after a short delay. Prevents losing work.
+    "files.autoSave": "afterDelay",
+
+
+    // --- Extension Specific Settings ---
+    // This setting was already in your file. It stops the Live Server extension from showing an info message.
+    "liveServer.settings.donotShowInfoMsg": true,
+
+    // These were also in your file, for the SQL Server (mssql) extension.
+    "mssql.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "D049DFCF-3C3B-426C-9D5C-E9241E625065"
+        }
+    ],
+    "mssql.connections": []
+}

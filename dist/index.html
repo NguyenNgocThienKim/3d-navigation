@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Navigation</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Lato:wght@400;700&family=Open+Sans:wght@400;600&family=Merriweather:wght@400;700&family=Nunito:wght@400;600&family=Montserrat:wght@400;600&family=Source+Sans+Pro:wght@400;600&family=Oswald:wght@400;600&family=Raleway:wght@400;600&family=Ubuntu:wght@400;500&family=Caveat&family=Pacifico&family=Orbitron&family=Quicksand&family=Indie+Flower&family=Architects+Daughter&display=swap" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="top-right-controls">
+        <a href="#" id="settingsToggleButton" class="control-button" title="Settings">
+            <i class="fas fa-cog"></i>
+        </a>
+        <div id="settingsPanel" class="settings-panel">
+            <h4 data-lang-key="settingsTitle">Settings</h4>
+            <div class="setting-item">
+                <span data-lang-key="soundLabel">Sound</span>
+                <div class="sound-controls-container">
+                    <a href="#" id="soundToggleButton" class="sound-control-button" title="Toggle Sound"><i class="fas fa-volume-mute"></i></a>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+                </div>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="zoomLabel">Zoom</span>
+                <input type="range" id="zoomSlider" min="80" max="150" step="1" value="100" title="Global Zoom">
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="darkModeLabel">Dark Mode</span>
+                <div class="dark-mode-toggle-container">
+                    <input type="checkbox" id="dark-mode-toggle-checkbox">
+                    <label for="dark-mode-toggle-checkbox" class="dark-mode-toggle-label">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </label>
+                </div>
+            </div>
+            <div class="setting-item theme-picker-container">
+                <span data-lang-key="themeLabel">Theme</span>
+                <div class="color-swatches">
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%)" style="background: linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,51,102,1) 0%, rgba(15,82,186,1) 100%)" style="background: linear-gradient(159deg, rgba(0,51,102,1) 0%, rgba(15,82,186,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(100,149,237,1) 0%, rgba(124,158,195,1) 100%)" style="background: linear-gradient(159deg, rgba(100,149,237,1) 0%, rgba(124,158,195,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%)" style="background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%)" style="background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,127,255,1) 0%, rgba(42,82,190,1) 100%)" style="background: linear-gradient(159deg, rgba(0,127,255,1) 0%, rgba(42,82,190,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(8,146,208,1) 0%, rgba(75,0,130,1) 100%)" style="background: linear-gradient(159deg, rgba(8,146,208,1) 0%, rgba(75,0,130,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,84,180,1) 0%, rgba(64,224,208,1) 100%)" style="background: linear-gradient(159deg, rgba(0,84,180,1) 0%, rgba(64,224,208,1) 100%);"></span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="fontLabel">Font</span>
+                <select id="fontChanger" class="settings-select">
+                    <option value="Poppins">Poppins</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Merriweather">Merriweather</option>
+                    <option value="Caveat">Caveat</option>
+                    <option value="Pacifico">Pacifico</option>
+                    <option value="Orbitron">Orbitron</option>
+                    <option value="Quicksand">Quicksand</option>
+                    <option value="Indie Flower">Indie Flower</option>
+                    <option value="Architects Daughter">Architects Daughter</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="languageLabel">Language</span>
+                <select id="languageSelect" class="settings-select">
+                    <option value="en">English</option>
+                    <option value="fil">Filipino</option>
+                    <option value="ko">Korean</option>
+                    <option value="ja">Japanese</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="zh">Chinese</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="es">Spanish</option>
+                 </select>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="accountLabel">Account</span>
+                <button id="logoutButton" class="logout-button" data-lang-key="logoutButton">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="initial-page-content" class="page-container">
+        <div class="main-header-banner">
+            <h1 class="menu-title" data-lang-key="universityTitle">UNIVERSITY - SAN PABLO CITY</h1>
+            <div class="menu-subtitle-container">
+                <p class="menu-subtitle"><span data-lang-key="universitySubtitle">Integrity, Professionalism and Innovation</span></p>
+            </div>
+        </div>
+        <div class="two-panel-layout">
+            <div class="panel logo-panel">
+                <img src="image/logo.png" alt="University Logo" class="logo-image">
+            </div>
+            <div class="panel login-panel">
+                <div class="login-form-wrapper">
+                    <form id="authForm" novalidate>
+                        <h2 id="formTitle" data-lang-key="loginTitle">Login</h2>
+                        <div id="authMessages"></div>
+                        <div class="user-type-selector">
+                            <label><input type="radio" name="userType" id="roleStudent" value="student" checked> <span data-lang-key="roleStudent">Student</span></label>
+                            <label><input type="radio" name="userType" id="roleVisitor" value="visitor"> <span data-lang-key="roleVisitor">Visitor</span></label>
+                        </div>
+                        <div class="input-field" id="studentIdContainer">
+                            <input type="text" id="studentId" name="studentId" required>
+                            <label for="studentId" data-lang-key="studentIdLabel">Enter your Student ID</label>
+                        </div>
+                        <div class="input-field" id="usernameContainer">
+                            <input type="text" id="username" name="username" required>
+                            <label for="username" data-lang-key="usernameLabel">Enter your Username</label>
+                        </div>
+                        <div class="input-field" id="passwordContainer">
+                            <input type="password" id="password" name="password" required>
+                            <label for="password" data-lang-key="passwordLabel">Enter your Password</label>
+                            <i class="fas fa-eye" id="togglePassword"></i>
+                        </div>
+                        <div class="forget" id="rememberMeContainer">
+                            <label><input type="checkbox" id="remember"><p data-lang-key="rememberMe">Remember me</p></label>
+                        </div>
+                        <button type="submit" id="submitButton" data-lang-key="loginButton">Log In</button>
+                        <div class="toggle-link" id="toggleLinkContainer">
+                            <p id="toggleMessageParagraph"><span data-lang-key="noAccount">Don't have an account?</span> <a href="#" id="toggleAuthLink" data-lang-key="registerLink">Register</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-screen" class="page-container">
+        <div class="loading-cat-container"> <div class="loading-cat"> <div class="body"></div> <div class="head"> <div class="face"></div> </div> <div class="foot"> <div class="tummy-end"></div> <div class="bottom"></div> <div class="legs left"></div> <div class="legs right"></div> </div> <div class="hands left"></div> <div class="hands right"></div> </div> <div class="loading-dots"> <div class="dot"></div> <div class="dot"></div> <div class="dot"></div> </div> </div>
+    </div>
+
+    <div id="menu-page" class="page-container">
+        <div class="menu-content-wrapper">
+            <div class="menu-header">
+                <h1 class="menu-title" data-lang-key="universityTitle">UNIVERSITY - SAN PABLO CITY</h1>
+                <div class="menu-subtitle-container">
+                    <p class="menu-subtitle"><span data-lang-key="universitySubtitle">Integrity, Professionalism and Innovation</span></p>
+                </div>
+            </div>
+            <div class="hexagon-menu">
+                <a href="#" class="hexagon hexagon-welcome" id="welcomeButton"><div class="hexagon-icon"><i class="fas fa-door-open"></i></div><span class="hexagon-text" data-lang-key="menuWelcome">WELCOME</span></a>
+                <a href="#" class="hexagon" id="aboutButton"><div class="hexagon-icon"><i class="fas fa-info-circle"></i></div><span class="hexagon-text" data-lang-key="menuAbout">ABOUT</span></a>
+                <a href="#" class="hexagon hexagon-shadowed" id="hexagon-2d-button"><div class="hexagon-icon"><i class="fas fa-th-large"></i></div><span class="hexagon-text" data-lang-key="menu2d">2D</span></a>
+                <a href="#" class="hexagon" id="hexagon-3d-button"><div class="hexagon-icon"><i class="fas fa-mobile-alt"></i></div><span class="hexagon-text" data-lang-key="menu3d">3D</span></a>
+                <a href="#" class="hexagon hexagon-shadowed" id="eventButton"><div class="hexagon-icon"><i class="fas fa-atom"></i></div><span class="hexagon-text" data-lang-key="menuEvent">EVENT</span></a>
+                <a href="#" class="hexagon" id="announcementButton"><div class="hexagon-icon"><i class="fas fa-clipboard-list"></i></div><span class="hexagon-text" data-lang-key="menuAnnouncement">ANNOUNCEMENT</span></a>
+                <a href="#" class="hexagon hexagon-shadowed" id="officeButton"><div class="hexagon-icon"><i class="fas fa-map-signs"></i></div><span class="hexagon-text" data-lang-key="menuOffice">OFFICE<br>INFORMATION</span></a>
+                <a href="#" class="hexagon" id="feedbackButton"><div class="hexagon-icon"><i class="fas fa-comments"></i></div><span class="hexagon-text" data-lang-key="menuFeedback">FEEDBACK</span></a>
+            </div>
+            <div class="back-to-login-container">
+                <button id="backToLoginButton" class="back-to-login-button" data-lang-key="backToMainButton">← Back to Main</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-2d-page" class="page-container">
+        <div class="map-top-left-controls">
+            <a href="#" id="backButtonFrom2D" class="map-ui-button"><i class="fas fa-arrow-left"></i> <span data-lang-key="backButton">BACK</span></a>
+            <div class="map-dropdown" id="mapAcademicsDropdown">
+                <button class="map-dropdown-button map-ui-button" id="mapAcademicsBtn">
+                    <i class="fas fa-university"></i> <span data-lang-key="menuAcademic">ACADEMICS</span> <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="map-dropdown-content" id="mapDropdownContent">
+                    <!-- College links will be injected here by JavaScript -->
+                </div>
+            </div>
+        </div>
+        <div class="map-area-wrapper">
+            <div id="map-content-area" class="map-content-area">
+                <img src="2dmap.png" alt="2D University Map" class="map-image-2d">
+                <!-- START: ACCURATE PIN LOCATIONS -->
+                <<div class="pin" style="left: 680px; top: 133px;"><div class="pin-text">1</div></div>
+                <div class="pin" style="left: 826px; top: 133px;"><div class="pin-text">2</div></div>
+                <div class="pin" style="left: 1000px; top: 107px;"><div class="pin-text">3</div></div>
+                <div class="pin" style="left: 1159px; top: 120px;"><div class="pin-text">4</div></div>
+                <div class="pin" style="left: 1000px; top: 259px;"><div class="pin-text">5</div></div>
+                <div class="pin" style="left: 840px; top: 259px;"><div class="pin-text">6</div></div>
+                <div class="pin" style="left: 680px; top: 318px;"><div class="pin-text">7</div></div>
+                <div class="pin" style="left: 1235px; top: 259px;"><div class="pin-text">8</div></div>
+                <div class="pin" style="left: 813px; top: 371px;"><div class="pin-text">9</div></div>
+                <div class="pin" style="left: 693px; top: 489px;"><div class="pin-text">10</div></div>
+                <div class="pin" style="left: 800px; top: 515px;"><div class="pin-text">11</div></div>
+                <div class="pin" style="left: 680px; top: 587px;"><div class="pin-text">12</div></div>
+                <div class="pin" style="left: 774px; top: 659px;"><div class="pin-text">13</div></div>
+                <div class="pin" style="left: 760px; top: 803px;"><div class="pin-text">14</div></div>
+                <div class="pin" style="left: 748px; top: 1029px;"><div class="pin-text">15</div></div>
+                <div class="pin" style="left: 1106px; top: 398px;"><div class="pin-text">16</div></div>
+                <div class="pin" style="left: 1209px; top: 398px;"><div class="pin-text">17</div></div>
+                <div class="pin" style="left: 1275px; top: 534px;"><div class="pin-text">18</div></div>
+                <div class="pin" style="left: 1395px; top: 561px;"><div class="pin-text">19</div></div>
+                <div class="pin" style="left: 1000px; top: 614px;"><div class="pin-text">20</div></div>
+                <div class="pin" style="left: 1106px; top: 614px;"><div class="pin-text">21</div></div>
+                <div class="pin" style="left: 1212px; top: 632px;"><div class="pin-text">22</div></div>
+                <div class="pin" style="left: 1328px; top: 641px;"><div class="pin-text">23</div></div>
+                <div class="pin" style="left: 1462px; top: 658px;"><div class="pin-text">24</div></div>
+                <div class="pin" style="left: 1040px; top: 712px;"><div class="pin-text">25</div></div>
+                <!-- END: ACCURATE PIN LOCATIONS -->
+            </div>
+            <div class="zoom-controls-container">
+                <a href="#" id="zoomInButton" class="zoom-button" title="Zoom In"><span><i class="fas fa-plus"></i></span></a>
+                <a href="#" id="zoomOutButton" class="zoom-button" title="Zoom Out"><span><i class="fas fa-minus"></i></span></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-popup-container" class="info-popup-container">
+        <div class="info-popup">
+            <div class="info-popup-header">
+                <div id="info-popup-icon" class="info-popup-icon"></div>
+                <button id="info-popup-close-btn" class="info-popup-close-btn">×</button>
+            </div>
+            <div id="info-popup-body" class="info-popup-body">
+                <!-- College course list will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="message-popup-container" class="message-popup-container" style="display: none;">
+        <div class="message-popup">
+            <div class="popup-icon-circle">
+                <i class="fas fa-map-marker-alt location-icon"></i>
+            </div>
+            <h2 class="message-popup-title" data-lang-key="popupTitle">Notice</h2>
+            <p class="message-popup-text" data-lang-key="popupMessage">This feature is coming soon!</p>
+            <button class="message-popup-button" data-lang-key="popupButton">OK</button>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop src="lspu.mp3"></audio>
+
+    <script src="js/script.js" defer></script>
+    <script src="js/login_form_script.js" defer></script>
+
+</body>
+</html>
