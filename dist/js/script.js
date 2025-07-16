@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadMapBtn = document.getElementById('loadmap-btn');
     const charPlaceholder2 = document.getElementById('char-placeholder-2');
     const charBackToMenuBtn = document.getElementById('char-back-to-menu-btn');
-    const selectCharIcon = selectCharBtn ? selectCharBtn.querySelector('i') : null;
     const loadMapIcon = loadMapBtn ? loadMapBtn.querySelector('i') : null;
 
 
@@ -186,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
         en: { 
             settingsTitle: "Settings", soundLabel: "Sound", zoomLabel: "Zoom", darkModeLabel: "Dark Mode", themeLabel: "Theme", fontLabel: "Font", languageLabel: "Language", accountLabel: "Account", settingsBackToMain: "Back to Main", 
             universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integrity, Professionalism and Innovation", backToMainConfirm: "Are you sure you want to return to the main page?", 
-            menuWelcome: "WELCOME", menuAbout: "ABOUT", menu2d: "2D", menu3d: "3D", backButton: "BACK", backToMainButton: "Back to Main", 
+            menuWelcome: "WELCOME", menuAbout: "ABOUT", menuMiniMap: "Mini Map", menu3d: "3D", backButton: "BACK", backToMainButton: "Back to Main", 
             popupFeatureComingSoon: "This feature is coming soon!", popupNoticeTitle: "Notice", popupSuccessTitle: "Success", popupOkButton: "OK", 
             characterSelected: "Character selected! You will now proceed to the campus.",
             welcomeTitle: "Welcome", welcomeText: "Press continue to begin the tour.", enterButton: "Continue", 
@@ -205,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fil: { 
             settingsTitle: "Mga Setting", soundLabel: "Tunog", zoomLabel: "Laki", darkModeLabel: "Dark Mode", themeLabel: "Tema", fontLabel: "Font", languageLabel: "Wika", accountLabel: "Account", settingsBackToMain: "Bumalik sa Simula", 
             universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integridad, Propesyonalismo at Inobasyon", backToMainConfirm: "Sigurado ka bang gusto mong bumalik sa pangunahing pahina?", 
-            menuWelcome: "MALIGAYANG<br>PAGDATING", menuAbout: "TUNGKOL SA", menu2d: "2D", menu3d: "3D", backButton: "BUMALIK", backToMainButton: "Bumalik sa Simula", 
+            menuWelcome: "MALIGAYANG<br>PAGDATING", menuAbout: "TUNGKOL SA", menuMiniMap: "Maliit na Mapa", menu3d: "3D", backButton: "BUMALIK", backToMainButton: "Bumalik sa Simula", 
             popupFeatureComingSoon: "Malapit nang magamit ang feature na ito!", popupNoticeTitle: "Paunawa", popupSuccessTitle: "Tagumpay", popupOkButton: "OK", 
             characterSelected: "Napili na ang karakter! Magpapatuloy ka na ngayon sa campus.",
             welcomeTitle: "Maligayang Pagdating", welcomeText: "Pindutin ang magpatuloy upang simulan ang paglilibot.", enterButton: "Magpatuloy", 
@@ -224,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
         vi: { 
             settingsTitle: "Cài đặt", soundLabel: "Âm thanh", zoomLabel: "Thu phóng", darkModeLabel: "Chế độ tối", themeLabel: "Giao diện", fontLabel: "Phông chữ", languageLabel: "Ngôn ngữ", accountLabel: "Tài khoản", settingsBackToMain: "Quay lại chính", 
             universityTitle: "TRƯỜNG ĐẠI HỌC BÁCH KHOA LAGUNA - THÀNH PHỐ SAN PABLO", universitySubtitle: "Chính trực, Chuyên nghiệp và Sáng tạo", backToMainConfirm: "Bạn có chắc chắn muốn quay lại trang chính không?", 
-            menuWelcome: "CHÀO MỪNG", menuAbout: "GIỚI THIỆU", menu2d: "2D", menu3d: "3D", backButton: "QUAY LẠI", backToMainButton: "Quay lại Trang chính", 
+            menuWelcome: "CHÀO MỪNG", menuAbout: "GIỚI THIỆU", menuMiniMap: "Bản đồ nhỏ", menu3d: "3D", backButton: "QUAY LẠI", backToMainButton: "Quay lại Trang chính", 
             popupFeatureComingSoon: "Tính năng này sẽ sớm ra mắt!", popupNoticeTitle: "Thông báo", popupSuccessTitle: "Thành công", popupOkButton: "OK", 
             characterSelected: "Đã chọn nhân vật! Bây giờ bạn sẽ tiến vào khuôn viên.",
             welcomeTitle: "Chào mừng", welcomeText: "Nhấn tiếp tục để bắt đầu chuyến tham quan.", enterButton: "Tiếp tục", 
@@ -243,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ko: { 
             settingsTitle: "설정", soundLabel: "소리", zoomLabel: "확대", darkModeLabel: "다크 모드", themeLabel: "테마", fontLabel: "글꼴", languageLabel: "언어", accountLabel: "계정", settingsBackToMain: "메인으로 돌아가기", 
             universityTitle: "라구나 주립 폴리테크닉 대학교 - 산 파블로 시", universitySubtitle: "정직, 전문성, 혁신", backToMainConfirm: "메인 페이지로 돌아가시겠습니까?", 
-            menuWelcome: "환영합니다", menuAbout: "소개", menu2d: "2D", menu3d: "3D", backButton: "뒤로", backToMainButton: "메인으로", 
+            menuWelcome: "환영합니다", menuAbout: "소개", menuMiniMap: "미니맵", menu3d: "3D", backButton: "뒤로", backToMainButton: "메인으로", 
             popupFeatureComingSoon: "이 기능은 곧 제공될 예정입니다!", popupNoticeTitle: "알림", popupSuccessTitle: "성공", popupOkButton: "확인", 
             characterSelected: "캐릭터가 선택되었습니다! 이제 캠퍼스로 이동합니다.",
             welcomeTitle: "환영합니다", welcomeText: "투어를 시작하려면 계속을 누르세요.", enterButton: "계속", 
@@ -262,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ja: { 
             settingsTitle: "設定", soundLabel: "音量", zoomLabel: "ズーム", darkModeLabel: "ダークモード", themeLabel: "テーマ", fontLabel: "フォント", languageLabel: "言語", accountLabel: "アカウント", settingsBackToMain: "メインに戻る", 
             universityTitle: "ラグナ州立工科大学 - サンパブロ市", universitySubtitle: "誠実さ、専門性、革新性", backToMainConfirm: "メインページに戻りますか？", 
-            menuWelcome: "ようこそ", menuAbout: "概要", menu2d: "2D", menu3d: "3D", backButton: "戻る", backToMainButton: "メインに戻る", 
+            menuWelcome: "ようこそ", menuAbout: "概要", menuMiniMap: "ミニマップ", menu3d: "3D", backButton: "戻る", backToMainButton: "メインに戻る", 
             popupFeatureComingSoon: "この機能は間もなく公開されます！", popupNoticeTitle: "お知らせ", popupSuccessTitle: "成功", popupOkButton: "OK", 
             characterSelected: "キャラクターが選択されました！キャンパスに進みます。",
             welcomeTitle: "ようこそ", welcomeText: "ツアーを開始するには続行を押してください。", enterButton: "続行", 
@@ -281,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
         zh: { 
             settingsTitle: "设置", soundLabel: "音量", zoomLabel: "缩放", darkModeLabel: "深色模式", themeLabel: "主题", fontLabel: "字体", languageLabel: "语言", accountLabel: "账户", settingsBackToMain: "返回主页", 
             universityTitle: "拉古纳理工州立大学 - 圣巴勃罗市", universitySubtitle: "诚信、专业、创新", backToMainConfirm: "您确定要返回主页吗？", 
-            menuWelcome: "欢迎", menuAbout: "关于", menu2d: "2D", menu3d: "3D", backButton: "返回", backToMainButton: "返回主页", 
+            menuWelcome: "欢迎", menuAbout: "关于", menuMiniMap: "小地图", menu3d: "3D", backButton: "返回", backToMainButton: "返回主页", 
             popupFeatureComingSoon: "此功能即将推出！", popupNoticeTitle: "注意", popupSuccessTitle: "成功", popupOkButton: "确定", 
             characterSelected: "角色已选择！现在将进入校园。",
             welcomeTitle: "欢迎", welcomeText: "按继续开始游览。", enterButton: "继续", 
@@ -300,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pt: { 
             settingsTitle: "Configurações", soundLabel: "Som", zoomLabel: "Zoom", darkModeLabel: "Modo Escuro", themeLabel: "Tema", fontLabel: "Fonte", languageLabel: "Idioma", accountLabel: "Conta", settingsBackToMain: "Voltar ao Início", 
             universityTitle: "UNIVERSIDADE POLITÉCNICA ESTADUAL DE LAGUNA - CIDADE DE SAN PABLO", universitySubtitle: "Integridade, Profissionalismo e Inovação", backToMainConfirm: "Tem certeza que quer voltar à página principal?", 
-            menuWelcome: "BEM-VINDO", menuAbout: "SOBRE", menu2d: "2D", menu3d: "3D", backButton: "VOLTAR", backToMainButton: "Voltar ao Início", 
+            menuWelcome: "BEM-VINDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLTAR", backToMainButton: "Voltar ao Início", 
             popupFeatureComingSoon: "Este recurso estará disponível em breve!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Sucesso", popupOkButton: "OK", 
             characterSelected: "Personagem selecionado! Você irá agora para o campus.",
             welcomeTitle: "Bem-vindo", welcomeText: "Pressione continuar para iniciar o tour.", enterButton: "Continuar", 
@@ -313,13 +312,13 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutDevsTitle: "Desenvolvedores", aboutDevsIntro: "Este projeto foi idealizado e desenvolvido pelos seguintes estudantes pesquisadores:",
             welcomeHistory1: "A Universidade Politécnica Estadual de Laguna (LSPU), fundada em 1952, começou como Escola Secundária Provincial de Baybay e evoluiu para seu status universitário atual sob a Lei da República nº 9402 em 2007. É uma instituição pública, sem fins lucrativos, reconhecida pela Comissão de Educação Superior (CHED) e pela Agência de Credenciamento de Faculdades e Universidades (AACCUP), oferecendo uma variedade de programas de graduação e pós-graduação em seus múltiplos campi.",
             welcomeHistory2: "A LSPU dedica-se à educação de qualidade, pesquisa e serviço comunitário, guiada por seus valores de integridade, profissionalismo e inovação. Seu campus principal está localizado em Santa Cruz, Laguna, com campi filiais regulares na cidade de San Pablo, Los Baños e Siniloan, além de campi satélites em Magdalena, Nagcarlan, Liliw e Lopez.",
-            welcomeHistory3: "Como um centro de inovação tecnológica, a LSPU promove o aprendizado interdisciplinar e o desenvolvimento sustentável por meio de fortes parcerias na região. A universidade atende aproximadamente 35.000 estudantes de graduação e 2.000 de pós-graduação, com cerca de 300 a 400 membros do corpo docente.",
+            welcomeHistory3: "Como um centro de inovação tecnológica, a LSPU promove o aprendizado interdisciplinar e o desenvolvimento sustentável por meio de fortes parcerias na região. A universidade atende aproximadamente 35,000 estudantes de graduação e 2,000 de pós-graduação, com cerca de 300 a 400 membros do corpo docente.",
             welcomePopupMVTitle: "Missão e Visão", welcomePopupMissionTitle: "MISSÃO", welcomePopupMissionText: "A LSPU, impulsionada por uma liderança progressista, é uma instituição de primeira linha que oferece agricultura mediada por tecnologia, pesca e outras disciplinas relacionadas e emergentes, contribuindo significativamente para o crescimento e desenvolvimento da região e da nação.", welcomePopupVisionTitle: "VISÃO", welcomePopupVisionText: "A LSPU é um centro de inovação tecnológica que promove o aprendizado interdisciplinar, a utilização sustentável de recursos e a colaboração e parceria com a comunidade e as partes interessadas."
         },
         es: { 
             settingsTitle: "Configuraciones", soundLabel: "Sonido", zoomLabel: "Zoom", darkModeLabel: "Modo Oscuro", themeLabel: "Tema", fontLabel: "Fuente", languageLabel: "Idioma", accountLabel: "Cuenta", settingsBackToMain: "Volver al Inicio", 
             universityTitle: "UNIVERSIDAD POLITÉCNICA ESTATAL DE LAGUNA - CIUDAD DE SAN PABLO", universitySubtitle: "Integridad, Profesionalismo e Innovación", backToMainConfirm: "¿Seguro que quieres volver a la página principal?", 
-            menuWelcome: "BIENVENIDO", menuAbout: "SOBRE", menu2d: "2D", menu3d: "3D", backButton: "VOLVER", backToMainButton: "Volver al Inicio", 
+            menuWelcome: "BIENVENIDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLVER", backToMainButton: "Volver al Inicio", 
             popupFeatureComingSoon: "¡Esta función estará disponible pronto!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Éxito", popupOkButton: "OK", 
             characterSelected: "¡Personaje seleccionado! Ahora procederás al campus.",
             welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar", 
@@ -653,8 +652,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function switchToCharacterView() {
         isMapView = false;
         clearScene();
+        
+        // MODIFICATION: Remove fullscreen class for character view
+        if (characterSelectionPage) {
+            characterSelectionPage.classList.remove('map-view-active');
+        }
 
-        if (selectCharIcon) selectCharIcon.className = 'fas fa-user-check';
         if (loadMapIcon) loadMapIcon.className = 'fas fa-map';
 
         threeControls.enablePan = true;
@@ -672,7 +675,11 @@ document.addEventListener('DOMContentLoaded', function () {
         isMapView = true;
         clearScene();
         
-        if (selectCharIcon) selectCharIcon.className = 'fas fa-user';
+        // MODIFICATION: Add fullscreen class for map view
+        if (characterSelectionPage) {
+            characterSelectionPage.classList.add('map-view-active');
+        }
+        
         if (loadMapIcon) loadMapIcon.className = 'fas fa-map-location-dot';
 
         updateSideMenuState();
@@ -685,19 +692,31 @@ document.addEventListener('DOMContentLoaded', function () {
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
             
+            // Center the model's geometry at the world origin
             currentModel.position.sub(center);
             threeScene.add(currentModel);
 
+            // FIX: Adjust camera target and position for better framing
+            // The model's visual weight is not at its geometric center.
+            // We shift the camera's target to the right to compensate.
+            const targetOffset = new THREE.Vector3(size.x * 0.15, 0, 0);
+
+            threeControls.target.copy(targetOffset);
             threeControls.enablePan = true;
             threeControls.minDistance = 10;
             threeControls.maxDistance = 200;
-            threeControls.target.set(0, 0, 0);
             
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = threeCamera.fov * (Math.PI / 180);
             const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
             
-            threeCamera.position.set(0, size.y, cameraZ * 1.2);
+            // Position the camera relative to the new, adjusted target
+            threeCamera.position.set(
+                targetOffset.x,
+                size.y * 1.1, // A slightly adjusted height
+                targetOffset.z + cameraZ * 1.25 // A bit further back to ensure it fits
+            );
+            
             threeControls.update();
 
         }, undefined, (error) => {
@@ -754,6 +773,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (charBackToMenuBtn) {
         charBackToMenuBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            // MODIFICATION: Ensure fullscreen class is removed when going back
+            if (characterSelectionPage) {
+                characterSelectionPage.classList.remove('map-view-active');
+            }
             showPage(menuPage);
         });
     }
