@@ -1,9 +1,9 @@
-import * as THREE from '../libs/three.module.js';
-import { GLTFLoader } from '../libs/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from '../libs/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-    
+
     // --- Get all general elements ---
     const bodyElement = document.body;
     const initialPageContent = document.getElementById('initial-page-content');
@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const settingsToggleButton = document.getElementById('settingsToggleButton');
     const settingsPanel = document.getElementById('settingsPanel');
     const darkModeCheckbox = document.getElementById('dark-mode-toggle-checkbox');
-    const languageSelect = document.getElementById('languageSelect'); 
-    
+    const languageSelect = document.getElementById('languageSelect');
+
     const settingsBackToMainButton = document.getElementById('settingsBackToMainButton');
     const fontChanger = document.getElementById('fontChanger');
     const zoomSlider = document.getElementById('zoomSlider');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const backgroundMusic = document.getElementById('backgroundMusic');
     const volumeSlider = document.getElementById('volumeSlider');
     const backButtonFrom2D = document.getElementById('backButtonFrom2D');
-    
+
     const enterUniversityButton = document.getElementById('enterUniversityButton');
 
     // --- Info Popup (About) Elements ---
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const pinPopupIcon = document.getElementById('pin-popup-icon');
     const pinPopupTitle = document.getElementById('pin-popup-title');
     const pinPopupNextBtn = document.getElementById('pin-popup-next-btn');
-    
+
     // --- College Info Popup Elements ---
     const collegeInfoPopupContainer = document.getElementById('college-info-popup-container');
     const collegeInfoPopupCloseBtn = document.getElementById('college-info-popup-close-btn');
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const welcomePopupPrevBtn = document.getElementById('welcome-popup-prev-btn');
     const welcomePages = document.querySelectorAll('.welcome-page');
     let currentWelcomePageIndex = 0;
-    
+
     // --- Character Selection Page Elements ---
     const characterSelectionPage = document.getElementById('character-selection-page');
     const characterCanvasContainer = document.getElementById('character-canvas-container');
@@ -95,10 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
     let isSceneInitialized = false;
     let currentCharacterIndex = 0;
     const characterModels = [
-    'models/character/student1/girl.gltf',
-    'models/character/student2/boy.gltf',
-    'models/character/teacher/teacher.gltf'
-];
+        'models/character/student1/girl.gltf',
+        'models/character/student2/boy.gltf',
+        'models/character/teacher/teacher.gltf'
+    ];
     let isMapView = false; // State to track if map is shown
     let animationRequestId;
 
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
             showPage(initialPageContent);
         });
     }
-    
-    if(settingsBackToMainButton) {
+
+    if (settingsBackToMainButton) {
         settingsBackToMainButton.addEventListener('click', (e) => {
             e.preventDefault();
             const lang = localStorage.getItem('language') || 'en';
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
         [initialPageContent, studentLoadingScreen, visitorLoadingScreen, menuPage, map2DPage, characterSelectionPage, main3DCampusPage].forEach(page => {
             if (page) page.style.display = 'none';
         });
-        
+
         if (pageElement) {
             pageElement.style.display = 'flex';
         }
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (targetPageFunction) targetPageFunction();
         }, duration);
     }
-    
+
     window.showMessage = function (type, title, text, buttonText, onButtonClick) {
         if (!messagePopupContainer) return;
         const popup = messagePopupContainer.querySelector('.message-popup');
@@ -158,10 +158,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const titleEl = messagePopupContainer.querySelector('.message-popup-title');
         const textEl = messagePopupContainer.querySelector('.message-popup-text');
         const buttonEl = messagePopupContainer.querySelector('.message-popup-button');
-        
+
         popup.className = `message-popup ${type}`;
         iconCircle.className = `popup-icon-circle`;
-        
+
         if (type === 'success') {
             iconCircle.innerHTML = '<i class="fas fa-check"></i>';
         } else {
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
         textEl.innerHTML = text;
         buttonEl.textContent = buttonText;
         messagePopupContainer.style.display = 'flex';
-        
+
         buttonEl.onclick = () => {
             messagePopupContainer.style.display = 'none';
             if (onButtonClick) {
@@ -182,13 +182,13 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.translations = {
-        en: { 
-            settingsTitle: "Settings", soundLabel: "Sound", zoomLabel: "Zoom", darkModeLabel: "Dark Mode", themeLabel: "Theme", fontLabel: "Font", languageLabel: "Language", accountLabel: "Account", settingsBackToMain: "Back to Main", 
-            universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integrity, Professionalism and Innovation", backToMainConfirm: "Are you sure you want to return to the main page?", 
-            menuWelcome: "WELCOME", menuAbout: "ABOUT", menuMiniMap: "Mini Map", menu3d: "3D", backButton: "BACK", backToMainButton: "Back to Main", 
-            popupFeatureComingSoon: "This feature is coming soon!", popupNoticeTitle: "Notice", popupSuccessTitle: "Success", popupOkButton: "OK", 
+        en: {
+            settingsTitle: "Settings", soundLabel: "Sound", zoomLabel: "Zoom", darkModeLabel: "Dark Mode", themeLabel: "Theme", fontLabel: "Font", languageLabel: "Language", accountLabel: "Account", settingsBackToMain: "Back to Main",
+            universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integrity, Professionalism and Innovation", backToMainConfirm: "Are you sure you want to return to the main page?",
+            menuWelcome: "WELCOME", menuAbout: "ABOUT", menuMiniMap: "Mini Map", menu3d: "3D", backButton: "BACK", backToMainButton: "Back to Main",
+            popupFeatureComingSoon: "This feature is coming soon!", popupNoticeTitle: "Notice", popupSuccessTitle: "Success", popupOkButton: "OK",
             characterSelected: "Character selected! You will now proceed to the campus.",
-            welcomeTitle: "Welcome", welcomeText: "Press continue to begin the tour.", enterButton: "Continue", 
+            welcomeTitle: "Welcome", welcomeText: "Press continue to begin the tour.", enterButton: "Continue",
             loadingTextStudent: "Enrolling you into the virtual campus...", loadingTextVisitor: "Preparing your tour...",
             loadingWelcomeStudent: "Welcome Student to LSPU Campus of San Pablo City! We hope you enjoy looking around your university! If you're lost we got your back! Look around the campus, see where the best spot to relax with your friends!",
             loadingWelcomeVisitor: "Welcome to Laguna State Polytechnic University – San Pablo City Campus! Feel free to explore and get to know our university grounds. Whether you're here for an event, a meeting, or just a quick tour, our 3D map is here to guide you every step of the way!",
@@ -201,13 +201,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "As a center of technological innovation, LSPU promotes interdisciplinary learning and sustainable development through strong partnerships within the region. The university serves approximately 35,000 undergraduate and 2,000 graduate students, with about 300–400 faculty members.",
             welcomePopupMVTitle: "Mission & Vision", welcomePopupMissionTitle: "MISSION", welcomePopupMissionText: "LSPU, driven by progressive leadership, is a premier institution providing technology-mediated agriculture, fisheries and other related and emerging disciplines significantly contributing to the growth and development of the region and nation.", welcomePopupVisionTitle: "VISION", welcomePopupVisionText: "LSPU is a center of technological innovation that promotes interdisciplinary learning, sustainable utilization of resources, and collaboration and partnership with the community and stakeholders."
         },
-        fil: { 
-            settingsTitle: "Mga Setting", soundLabel: "Tunog", zoomLabel: "Laki", darkModeLabel: "Dark Mode", themeLabel: "Tema", fontLabel: "Font", languageLabel: "Wika", accountLabel: "Account", settingsBackToMain: "Bumalik sa Simula", 
-            universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integridad, Propesyonalismo at Inobasyon", backToMainConfirm: "Sigurado ka bang gusto mong bumalik sa pangunahing pahina?", 
-            menuWelcome: "MALIGAYANG<br>PAGDATING", menuAbout: "TUNGKOL SA", menuMiniMap: "Maliit na Mapa", menu3d: "3D", backButton: "BUMALIK", backToMainButton: "Bumalik sa Simula", 
-            popupFeatureComingSoon: "Malapit nang magamit ang feature na ito!", popupNoticeTitle: "Paunawa", popupSuccessTitle: "Tagumpay", popupOkButton: "OK", 
+        fil: {
+            settingsTitle: "Mga Setting", soundLabel: "Tunog", zoomLabel: "Laki", darkModeLabel: "Dark Mode", themeLabel: "Tema", fontLabel: "Font", languageLabel: "Wika", accountLabel: "Account", settingsBackToMain: "Bumalik sa Simula",
+            universityTitle: "LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY", universitySubtitle: "Integridad, Propesyonalismo at Inobasyon", backToMainConfirm: "Sigurado ka bang gusto mong bumalik sa pangunahing pahina?",
+            menuWelcome: "MALIGAYANG<br>PAGDATING", menuAbout: "TUNGKOL SA", menuMiniMap: "Maliit na Mapa", menu3d: "3D", backButton: "BUMALIK", backToMainButton: "Bumalik sa Simula",
+            popupFeatureComingSoon: "Malapit nang magamit ang feature na ito!", popupNoticeTitle: "Paunawa", popupSuccessTitle: "Tagumpay", popupOkButton: "OK",
             characterSelected: "Napili na ang karakter! Magpapatuloy ka na ngayon sa campus.",
-            welcomeTitle: "Maligayang Pagdating", welcomeText: "Pindutin ang magpatuloy upang simulan ang paglilibot.", enterButton: "Magpatuloy", 
+            welcomeTitle: "Maligayang Pagdating", welcomeText: "Pindutin ang magpatuloy upang simulan ang paglilibot.", enterButton: "Magpatuloy",
             loadingTextStudent: "Inililista ka sa birtuwal na kampus...", loadingTextVisitor: "Inihahanda ang iyong paglilibot...",
             loadingWelcomeStudent: "Maligayang pagdating, Mag-aaral, sa LSPU Campus ng Lungsod ng San Pablo! Sana'y masiyahan ka sa paglilibot sa iyong unibersidad! Kung ikaw ay naliligaw, kami ang bahala sa iyo! Maglibot sa kampus, tingnan kung saan ang pinakamagandang lugar para mag-relax kasama ang iyong mga kaibigan!",
             loadingWelcomeVisitor: "Maligayang pagdating sa Laguna State Polytechnic University – San Pablo City Campus! Huwag mag-atubiling mag-explore at kilalanin ang aming unibersidad. Kung ikaw ay narito para sa isang kaganapan, pulong, o isang mabilis na paglilibot, narito ang aming 3D map para gabayan ka sa bawat hakbang!",
@@ -220,13 +220,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "Bilang sentro ng teknolohikal na inobasyon, isinusulong ng LSPU ang interdisiplinaryong pag-aaral at napapanatiling pag-unlad sa pamamagitan ng matatag na pakikipagsosyo sa loob ng rehiyon. Naglilingkod ang unibersidad sa humigit-kumulang 35,000 undergraduate at 2,000 graduate na mag-aaral, na may mga 300–400 na miyembro ng guro.",
             welcomePopupMVTitle: "Misyon at Bisyon", welcomePopupMissionTitle: "MISYON", welcomePopupMissionText: "Ang LSPU, na pinapatakbo ng progresibong pamumuno, ay isang pangunahing institusyon na nagbibigay ng edukasyon sa agrikultura, pangingisda, at iba pang kaugnay na disiplina gamit ang teknolohiya, na malaki ang naiambag sa paglago at pag-unlad ng rehiyon at bansa.", welcomePopupVisionTitle: "BISYON", welcomePopupVisionText: "Ang LSPU ay sentro ng inobasyong teknolohikal na nagsusulong ng interdisiplinaryong pag-aaral, napapanatiling paggamit ng mga yaman, at pakikipagtulungan sa komunidad at mga stakeholder."
         },
-        vi: { 
-            settingsTitle: "Cài đặt", soundLabel: "Âm thanh", zoomLabel: "Thu phóng", darkModeLabel: "Chế độ tối", themeLabel: "Giao diện", fontLabel: "Phông chữ", languageLabel: "Ngôn ngữ", accountLabel: "Tài khoản", settingsBackToMain: "Quay lại chính", 
-            universityTitle: "TRƯỜNG ĐẠI HỌC BÁCH KHOA LAGUNA - THÀNH PHỐ SAN PABLO", universitySubtitle: "Chính trực, Chuyên nghiệp và Sáng tạo", backToMainConfirm: "Bạn có chắc chắn muốn quay lại trang chính không?", 
-            menuWelcome: "CHÀO MỪNG", menuAbout: "GIỚI THIỆU", menuMiniMap: "Bản đồ nhỏ", menu3d: "3D", backButton: "QUAY LẠI", backToMainButton: "Quay lại Trang chính", 
-            popupFeatureComingSoon: "Tính năng này sẽ sớm ra mắt!", popupNoticeTitle: "Thông báo", popupSuccessTitle: "Thành công", popupOkButton: "OK", 
+        vi: {
+            settingsTitle: "Cài đặt", soundLabel: "Âm thanh", zoomLabel: "Thu phóng", darkModeLabel: "Chế độ tối", themeLabel: "Giao diện", fontLabel: "Phông chữ", languageLabel: "Ngôn ngữ", accountLabel: "Tài khoản", settingsBackToMain: "Quay lại chính",
+            universityTitle: "TRƯỜNG ĐẠI HỌC BÁCH KHOA LAGUNA - THÀNH PHỐ SAN PABLO", universitySubtitle: "Chính trực, Chuyên nghiệp và Sáng tạo", backToMainConfirm: "Bạn có chắc chắn muốn quay lại trang chính không?",
+            menuWelcome: "CHÀO MỪNG", menuAbout: "GIỚI THIỆU", menuMiniMap: "Bản đồ nhỏ", menu3d: "3D", backButton: "QUAY LẠI", backToMainButton: "Quay lại Trang chính",
+            popupFeatureComingSoon: "Tính năng này sẽ sớm ra mắt!", popupNoticeTitle: "Thông báo", popupSuccessTitle: "Thành công", popupOkButton: "OK",
             characterSelected: "Đã chọn nhân vật! Bây giờ bạn sẽ tiến vào khuôn viên.",
-            welcomeTitle: "Chào mừng", welcomeText: "Nhấn tiếp tục để bắt đầu chuyến tham quan.", enterButton: "Tiếp tục", 
+            welcomeTitle: "Chào mừng", welcomeText: "Nhấn tiếp tục để bắt đầu chuyến tham quan.", enterButton: "Tiếp tục",
             loadingTextStudent: "Đang ghi danh bạn vào khuôn viên ảo...", loadingTextVisitor: "Đang chuẩn bị chuyến tham quan của bạn...",
             loadingWelcomeStudent: "Chào mừng Sinh viên đến với Cơ sở LSPU tại Thành phố San Pablo! Chúng tôi hy vọng bạn sẽ thích thú khi dạo quanh trường đại học của mình! Nếu bạn bị lạc, chúng tôi sẽ hỗ trợ bạn! Hãy dạo quanh khuôn viên, xem đâu là nơi tuyệt vời nhất để thư giãn cùng bạn bè!",
             loadingWelcomeVisitor: "Chào mừng đến với Đại học Bách khoa Bang Laguna – Cơ sở Thành phố San Pablo! Hãy thoải mái khám phá và tìm hiểu về khuôn viên trường của chúng tôi. Dù bạn ở đây để tham dự một sự kiện, một cuộc họp hay chỉ là một chuyến tham quan nhanh, bản đồ 3D của chúng tôi luôn sẵn sàng hướng dẫn bạn trên mọi nẻo đường!",
@@ -239,13 +239,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "Là một trung tâm đổi mới công nghệ, LSPU thúc đẩy việc học tập liên ngành và phát triển bền vững thông qua các quan hệ đối tác chặt chẽ trong khu vực. Trường đại học này phục vụ khoảng 35.000 sinh viên đại học và 2.000 sinh viên sau đại học, với khoảng 300–400 giảng viên.",
             welcomePopupMVTitle: "Sứ mệnh & Tầm nhìn", welcomePopupMissionTitle: "SỨ MỆNH", welcomePopupMissionText: "LSPU, được dẫn dắt bởi sự lãnh đạo tiến bộ, là một cơ sở hàng đầu cung cấp các ngành nông nghiệp, thủy sản và các ngành mới nổi khác qua trung gian công nghệ, đóng góp đáng kể vào sự tăng trưởng và phát triển của khu vực và quốc gia.", welcomePopupVisionTitle: "TẦM NHÌN", welcomePopupVisionText: "LSPU là một trung tâm đổi mới công nghệ thúc đẩy học tập liên ngành, sử dụng bền vững các nguồn lực, và hợp tác và đối tác với cộng đồng và các bên liên quan."
         },
-        ko: { 
-            settingsTitle: "설정", soundLabel: "소리", zoomLabel: "확대", darkModeLabel: "다크 모드", themeLabel: "테마", fontLabel: "글꼴", languageLabel: "언어", accountLabel: "계정", settingsBackToMain: "메인으로 돌아가기", 
-            universityTitle: "라구나 주립 폴리테크닉 대학교 - 산 파블로 시", universitySubtitle: "정직, 전문성, 혁신", backToMainConfirm: "메인 페이지로 돌아가시겠습니까?", 
-            menuWelcome: "환영합니다", menuAbout: "소개", menuMiniMap: "미니맵", menu3d: "3D", backButton: "뒤로", backToMainButton: "메인으로", 
-            popupFeatureComingSoon: "이 기능은 곧 제공될 예정입니다!", popupNoticeTitle: "알림", popupSuccessTitle: "성공", popupOkButton: "확인", 
+        ko: {
+            settingsTitle: "설정", soundLabel: "소리", zoomLabel: "확대", darkModeLabel: "다크 모드", themeLabel: "테마", fontLabel: "글꼴", languageLabel: "언어", accountLabel: "계정", settingsBackToMain: "메인으로 돌아가기",
+            universityTitle: "라구나 주립 폴리테크닉 대학교 - 산 파블로 시", universitySubtitle: "정직, 전문성, 혁신", backToMainConfirm: "메인 페이지로 돌아가시겠습니까?",
+            menuWelcome: "환영합니다", menuAbout: "소개", menuMiniMap: "미니맵", menu3d: "3D", backButton: "뒤로", backToMainButton: "메인으로",
+            popupFeatureComingSoon: "이 기능은 곧 제공될 예정입니다!", popupNoticeTitle: "알림", popupSuccessTitle: "성공", popupOkButton: "확인",
             characterSelected: "캐릭터가 선택되었습니다! 이제 캠퍼스로 이동합니다.",
-            welcomeTitle: "환영합니다", welcomeText: "투어를 시작하려면 계속을 누르세요.", enterButton: "계속", 
+            welcomeTitle: "환영합니다", welcomeText: "투어를 시작하려면 계속을 누르세요.", enterButton: "계속",
             loadingTextStudent: "가상 캠퍼스에 등록 중...", loadingTextVisitor: "투어를 준비 중입니다...",
             loadingWelcomeStudent: "산 파블로 시 LSPU 캠퍼스에 오신 학생 여러분을 환영합니다! 대학을 둘러보며 즐거운 시간을 보내시길 바랍니다! 길을 잃으셨다면 저희가 도와드리겠습니다! 캠퍼스를 둘러보며 친구들과 함께 휴식을 취할 최고의 장소를 찾아보세요!",
             loadingWelcomeVisitor: "라구나 주립 폴리테크닉 대학교 – 산 파블로 시 캠퍼스에 오신 것을 환영합니다! 자유롭게 둘러보며 저희 대학 부지를 알아보세요. 행사에 참석하셨든, 회의에 오셨든, 아니면 간단한 투어를 원하시든, 저희 3D 지도가 모든 단계에서 여러분을 안내해 드릴 것입니다!",
@@ -258,13 +258,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "기술 혁신의 중심지로서 LSPU는 지역 내 강력한 파트너십을 통해 학제 간 학습과 지속 가능한 발전을 촉진합니다. 이 대학은 약 35,000명의 학부생과 2,000명의 대학원생, 그리고 약 300-400명의 교수진을 보유하고 있습니다.",
             welcomePopupMVTitle: "사명과 비전", welcomePopupMissionTitle: "사명", welcomePopupMissionText: "LSPU는 진보적인 리더십에 의해 운영되며, 기술 매개 농업, 어업 및 기타 관련 신흥 분야를 제공하는 최고의 기관으로서 지역 및 국가의 성장과 발전에 크게 기여합니다.", welcomePopupVisionTitle: "비전", welcomePopupVisionText: "LSPU는 학제 간 학습, 자원의 지속 가능한 활용, 그리고 커뮤니티 및 이해관계자와의 협력 및 파트너십을 촉진하는 기술 혁신의 중심지입니다."
         },
-        ja: { 
-            settingsTitle: "設定", soundLabel: "音量", zoomLabel: "ズーム", darkModeLabel: "ダークモード", themeLabel: "テーマ", fontLabel: "フォント", languageLabel: "言語", accountLabel: "アカウント", settingsBackToMain: "メインに戻る", 
-            universityTitle: "ラグナ州立工科大学 - サンパブロ市", universitySubtitle: "誠実さ、専門性、革新性", backToMainConfirm: "メインページに戻りますか？", 
-            menuWelcome: "ようこそ", menuAbout: "概要", menuMiniMap: "ミニマップ", menu3d: "3D", backButton: "戻る", backToMainButton: "メインに戻る", 
-            popupFeatureComingSoon: "この機能は間もなく公開されます！", popupNoticeTitle: "お知らせ", popupSuccessTitle: "成功", popupOkButton: "OK", 
+        ja: {
+            settingsTitle: "設定", soundLabel: "音量", zoomLabel: "ズーム", darkModeLabel: "ダークモード", themeLabel: "テーマ", fontLabel: "フォント", languageLabel: "言語", accountLabel: "アカウント", settingsBackToMain: "メインに戻る",
+            universityTitle: "ラグナ州立工科大学 - サンパブロ市", universitySubtitle: "誠実さ、専門性、革新性", backToMainConfirm: "メインページに戻りますか？",
+            menuWelcome: "ようこそ", menuAbout: "概要", menuMiniMap: "ミニマップ", menu3d: "3D", backButton: "戻る", backToMainButton: "メインに戻る",
+            popupFeatureComingSoon: "この機能は間もなく公開されます！", popupNoticeTitle: "お知らせ", popupSuccessTitle: "成功", popupOkButton: "OK",
             characterSelected: "キャラクターが選択されました！キャンパスに進みます。",
-            welcomeTitle: "ようこそ", welcomeText: "ツアーを開始するには続行を押してください。", enterButton: "続行", 
+            welcomeTitle: "ようこそ", welcomeText: "ツアーを開始するには続行を押してください。", enterButton: "続行",
             loadingTextStudent: "仮想キャンパスに登録しています...", loadingTextVisitor: "ツアーを準備しています...",
             loadingWelcomeStudent: "サンパブロ市のLSPUキャンパスへようこそ！大学内を楽しく散策してください！道に迷っても大丈夫です！キャンパスを歩き回り、友達とリラックスできる最高の場所を見つけてください！",
             loadingWelcomeVisitor: "ラグナ州立工科大学 – サンパブロ市キャンパスへようこそ！自由に探索して、私たちの大学の敷地を知ってください。イベント、会議、または簡単なツアーのためにここにいるかどうかにかかわらず、私たちの3Dマップがあなたをあらゆる段階でご案内します！",
@@ -277,13 +277,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "技術革新の中心として、LSPUは地域内での強力なパートナーシップを通じて学際的な学習と持続可能な開発を促進しています。大学には約35,000人の学部生と2,000人の大学院生が在籍しており、約300人から400人の教員がいます。",
             welcomePopupMVTitle: "使命とビジョン", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "LSPUは、進歩的なリーダーシップによって推進され、技術を介した農業、漁業、その他の関連および新興分野を提供する最高の機関であり、地域および国家の成長と発展に大きく貢献しています。", welcomePopupVisionTitle: "ビジョン", welcomePopupVisionText: "LSPUは、学際的な学習、資源の持続可能な利用、そして地域社会や利害関係者との協力とパートナーシップを促進する技術革新の中心です。"
         },
-        zh: { 
-            settingsTitle: "设置", soundLabel: "音量", zoomLabel: "缩放", darkModeLabel: "深色模式", themeLabel: "主题", fontLabel: "字体", languageLabel: "语言", accountLabel: "账户", settingsBackToMain: "返回主页", 
-            universityTitle: "拉古纳理工州立大学 - 圣巴勃罗市", universitySubtitle: "诚信、专业、创新", backToMainConfirm: "您确定要返回主页吗？", 
-            menuWelcome: "欢迎", menuAbout: "关于", menuMiniMap: "小地图", menu3d: "3D", backButton: "返回", backToMainButton: "返回主页", 
-            popupFeatureComingSoon: "此功能即将推出！", popupNoticeTitle: "注意", popupSuccessTitle: "成功", popupOkButton: "确定", 
+        zh: {
+            settingsTitle: "设置", soundLabel: "音量", zoomLabel: "缩放", darkModeLabel: "深色模式", themeLabel: "主题", fontLabel: "字体", languageLabel: "语言", accountLabel: "账户", settingsBackToMain: "返回主页",
+            universityTitle: "拉古纳理工州立大学 - 圣巴勃罗市", universitySubtitle: "诚信、专业、创新", backToMainConfirm: "您确定要返回主页吗？",
+            menuWelcome: "欢迎", menuAbout: "关于", menuMiniMap: "小地图", menu3d: "3D", backButton: "返回", backToMainButton: "返回主页",
+            popupFeatureComingSoon: "此功能即将推出！", popupNoticeTitle: "注意", popupSuccessTitle: "成功", popupOkButton: "确定",
             characterSelected: "角色已选择！现在将进入校园。",
-            welcomeTitle: "欢迎", welcomeText: "按继续开始游览。", enterButton: "继续", 
+            welcomeTitle: "欢迎", welcomeText: "按继续开始游览。", enterButton: "继续",
             loadingTextStudent: "正在将您注册到虚拟校园...", loadingTextVisitor: "正在准备您的旅程...",
             loadingWelcomeStudent: "欢迎学生来到圣巴勃罗市LSPU校区！我们希望您喜欢在您的大学里四处看看！如果您迷路了，我们会支持您！在校园里四处看看，找一个和朋友们放松的最佳地点吧！",
             loadingWelcomeVisitor: "欢迎来到拉古纳理工州立大学 – 圣巴勃罗市校区！请随意探索和了解我们的大学校园。无论您是来参加活动、会议，还是只是快速游览，我们的3D地图都会为您提供每一步的指引！",
@@ -296,13 +296,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "作为技术创新的中心，LSPU通过与该地区内建立强大的伙伴关系，促进跨学科学习和可持续发展。该大学为大约35,000名本科生和2,000名研究生提供服务，拥有约300-400名教职员工。",
             welcomePopupMVTitle: "使命与愿景", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "在进步领导力的推动下，LSPU是一所一流的机构，提供技术媒介的农业、渔业及其他相关和新兴学科，为地区和国家的发展做出了重大贡献。", welcomePopupVisionTitle: "愿景", welcomePopupVisionText: "LSPU是一个技术创新中心，促进跨学科学习、资源的可持续利用，以及与社区和利益相关者的合作与伙伴关系。"
         },
-        pt: { 
-            settingsTitle: "Configurações", soundLabel: "Som", zoomLabel: "Zoom", darkModeLabel: "Modo Escuro", themeLabel: "Tema", fontLabel: "Fonte", languageLabel: "Idioma", accountLabel: "Conta", settingsBackToMain: "Voltar ao Início", 
-            universityTitle: "UNIVERSIDADE POLITÉCNICA ESTADUAL DE LAGUNA - CIDADE DE SAN PABLO", universitySubtitle: "Integridade, Profissionalismo e Inovação", backToMainConfirm: "Tem certeza que quer voltar à página principal?", 
-            menuWelcome: "BEM-VINDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLTAR", backToMainButton: "Voltar ao Início", 
-            popupFeatureComingSoon: "Este recurso estará disponível em breve!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Sucesso", popupOkButton: "OK", 
+        pt: {
+            settingsTitle: "Configurações", soundLabel: "Som", zoomLabel: "Zoom", darkModeLabel: "Modo Escuro", themeLabel: "Tema", fontLabel: "Fonte", languageLabel: "Idioma", accountLabel: "Conta", settingsBackToMain: "Voltar ao Início",
+            universityTitle: "UNIVERSIDADE POLITÉCNICA ESTADUAL DE LAGUNA - CIDADE DE SAN PABLO", universitySubtitle: "Integridade, Profissionalismo e Inovação", backToMainConfirm: "Tem certeza que quer voltar à página principal?",
+            menuWelcome: "BEM-VINDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLTAR", backToMainButton: "Voltar ao Início",
+            popupFeatureComingSoon: "Este recurso estará disponível em breve!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Sucesso", popupOkButton: "OK",
             characterSelected: "Personagem selecionado! Você irá agora para o campus.",
-            welcomeTitle: "Bem-vindo", welcomeText: "Pressione continuar para iniciar o tour.", enterButton: "Continuar", 
+            welcomeTitle: "Bem-vindo", welcomeText: "Pressione continuar para iniciar o tour.", enterButton: "Continuar",
             loadingTextStudent: "Inscrevendo você no campus virtual...", loadingTextVisitor: "Preparando seu tour...",
             loadingWelcomeStudent: "Bem-vindo, Estudante, ao Campus da LSPU na Cidade de San Pablo! Esperamos que você goste de conhecer sua universidade! Se estiver perdido, nós te ajudamos! Dê uma volta pelo campus, veja qual é o melhor lugar para relaxar com seus amigos!",
             loadingWelcomeVisitor: "Bem-vindo à Universidade Politécnica Estadual de Laguna – Campus da Cidade de San Pablo! Sinta-se à vontade para explorar e conhecer nosso campus universitário. Esteja você aqui para um evento, uma reunião ou apenas um tour rápido, nosso mapa 3D está aqui para guiá-lo em cada passo do caminho!",
@@ -315,13 +315,13 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory3: "Como um centro de inovação tecnológica, a LSPU promove o aprendizado interdisciplinar e o desenvolvimento sustentável por meio de fortes parcerias na região. A universidade atende aproximadamente 35,000 estudantes de graduação e 2,000 de pós-graduação, com cerca de 300 a 400 membros do corpo docente.",
             welcomePopupMVTitle: "Missão e Visão", welcomePopupMissionTitle: "MISSÃO", welcomePopupMissionText: "A LSPU, impulsionada por uma liderança progressista, é uma instituição de primeira linha que oferece agricultura mediada por tecnologia, pesca e outras disciplinas relacionadas e emergentes, contribuindo significativamente para o crescimento e desenvolvimento da região e da nação.", welcomePopupVisionTitle: "VISÃO", welcomePopupVisionText: "A LSPU é um centro de inovação tecnológica que promove o aprendizado interdisciplinar, a utilização sustentável de recursos e a colaboração e parceria com a comunidade e as partes interessadas."
         },
-        es: { 
-            settingsTitle: "Configuraciones", soundLabel: "Sonido", zoomLabel: "Zoom", darkModeLabel: "Modo Oscuro", themeLabel: "Tema", fontLabel: "Fuente", languageLabel: "Idioma", accountLabel: "Cuenta", settingsBackToMain: "Volver al Inicio", 
-            universityTitle: "UNIVERSIDAD POLITÉCNICA ESTATAL DE LAGUNA - CIUDAD DE SAN PABLO", universitySubtitle: "Integridad, Profesionalismo e Innovación", backToMainConfirm: "¿Seguro que quieres volver a la página principal?", 
-            menuWelcome: "BIENVENIDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLVER", backToMainButton: "Volver al Inicio", 
-            popupFeatureComingSoon: "¡Esta función estará disponible pronto!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Éxito", popupOkButton: "OK", 
+        es: {
+            settingsTitle: "Configuraciones", soundLabel: "Sonido", zoomLabel: "Zoom", darkModeLabel: "Modo Oscuro", themeLabel: "Tema", fontLabel: "Fuente", languageLabel: "Idioma", accountLabel: "Cuenta", settingsBackToMain: "Volver al Inicio",
+            universityTitle: "UNIVERSIDAD POLITÉCNICA ESTATAL DE LAGUNA - CIUDAD DE SAN PABLO", universitySubtitle: "Integridad, Profesionalismo e Innovación", backToMainConfirm: "¿Seguro que quieres volver a la página principal?",
+            menuWelcome: "BIENVENIDO", menuAbout: "SOBRE", menuMiniMap: "Mini Mapa", menu3d: "3D", backButton: "VOLVER", backToMainButton: "Volver al Inicio",
+            popupFeatureComingSoon: "¡Esta función estará disponible pronto!", popupNoticeTitle: "Aviso", popupSuccessTitle: "Éxito", popupOkButton: "OK",
             characterSelected: "¡Personaje seleccionado! Ahora procederás al campus.",
-            welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar", 
+            welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar",
             loadingTextStudent: "Inscribiéndote en el campus virtual...", loadingTextVisitor: "Preparando tu recorrido...",
             loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el mejor lugar para relajarte con tus amigos!",
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nuestra universidad. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomePopupMVTitle: "Misión y Visión", welcomePopupMissionTitle: "MISIÓN", welcomePopupMissionText: "LSPU, impulsada por un liderazgo progresista, es una institución de primer nivel que proporciona agricultura, pesca y otras disciplinas relacionadas y emergentes mediadas por la tecnología, contribuyendo significativamente al crecimiento y desarrollo de la región y la nación.", welcomePopupVisionTitle: "VISIÓN", welcomePopupVisionText: "LSPU es un centro de innovación tecnológica que promove o aprendizaje interdisciplinario, la utilización sostenible de los recursos, y la colaboración y asociación con la comunidad y las partes interesadas."
         }
     };
-    
+
     const buildingInfo = {
         cas: { icon: 'fa-paint-brush', title: 'College of Arts and Sciences (CAS)', colorClass: 'cas-color', details: '<ul><li><i class="fas fa-arrow-right"></i>Bachelor of Science in Biology (BSBio)</li><li><i class="fas fa-arrow-right"></i>Bachelor of Science in Psychology (BScPsych)</li></ul>' },
         cbaa: { icon: 'fa-briefcase', title: 'College of Business Administration and Accountancy (CBAA)', colorClass: 'cbaa-color', details: '<ul><li><i class="fas fa-arrow-right"></i>Bachelor of Science in Office Administration (BSOA)</li><li><i class="fas fa-arrow-right"></i>Bachelor of Science in Business Administration (BSBA)<ol><li>Financial Management (BSBA-FM)</li><li>Marketing Management (BSBA-MM)</li></ol></li><li><i class="fas fa-arrow-right"></i>Bachelor of Science in Accountancy (BSA)</li></ul>' },
@@ -384,10 +384,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.innerHTML = translation;
             }
         });
-        if(languageSelect) languageSelect.value = lang;
+        if (languageSelect) languageSelect.value = lang;
         window.dispatchEvent(new CustomEvent('languageChanged'));
     }
-    
+
     if (languageSelect) { languageSelect.addEventListener('change', (e) => setLanguage(e.target.value)); }
     function applyTheme(gradient) { localStorage.setItem('themeGradient', gradient); if (!bodyElement.classList.contains('dark-mode-active')) { bodyElement.style.background = gradient; } }
     function updateDarkMode(isDark) { localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled'); bodyElement.classList.toggle('dark-mode-active', isDark); if (isDark) { bodyElement.style.background = ''; } else { const savedTheme = localStorage.getItem('themeGradient') || 'linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%)'; bodyElement.style.background = savedTheme; } }
@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (infoPopupContainer) infoPopupContainer.style.display = 'flex';
         });
     }
-    
+
     if (infoPopupCloseBtn) { infoPopupCloseBtn.addEventListener('click', () => { if (infoPopupContainer) infoPopupContainer.style.display = 'none'; }); }
     if (infoPopupContainer) { infoPopupContainer.addEventListener('click', (e) => { if (e.target.id === 'info-popup-container') infoPopupContainer.style.display = 'none'; }); }
     if (infoPopupNextBtn) { infoPopupNextBtn.addEventListener('click', () => { if (currentInfoPageIndex < infoPages.length - 1) { currentInfoPageIndex++; updateInfoPages(); } }); }
@@ -453,13 +453,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showPinInfoPopup(data) {
         if (!pinInfoPopupContainer || !pinPopupIcon || !pinPopupTitle || !pinPopupNextBtn) return;
-        
+
         const nextButtonWrapper = pinPopupNextBtn.parentElement;
-        
+
         pinPopupIcon.className = `fas ${data.icon}`;
         pinPopupTitle.innerHTML = data.title;
         currentPinCollegeKey = data.collegeKey || null;
-        
+
         if (currentPinCollegeKey) {
             nextButtonWrapper.style.display = 'flex';
         } else {
@@ -468,24 +468,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         pinInfoPopupContainer.style.display = 'flex';
     }
-    
+
     function showCollegeInfoPopup(collegeKey) {
         const popup = collegeInfoPopupContainer.querySelector('.pin-info-popup');
         if (!popup || !buildingInfo[collegeKey]) return;
-    
+
         // Reset classes before adding the new one
         popup.className = 'pin-info-popup college-popup';
-        
+
         const info = buildingInfo[collegeKey];
         collegePopupIcon.className = `fas ${info.icon}`;
         collegePopupTitle.textContent = info.title;
         collegePopupDetails.innerHTML = info.details;
-    
+
         // Add the specific color class for the college
         if (info.colorClass) {
             popup.classList.add(info.colorClass);
         }
-        
+
         collegeInfoPopupContainer.style.display = 'flex';
     }
 
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     if (welcomePopupPrevBtn) {
         welcomePopupPrevBtn.addEventListener('click', () => {
             if (currentWelcomePageIndex > 0) {
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     pinData.forEach(data => {
         const pinElement = document.getElementById(`pin-${data.id}`);
         if (pinElement) {
@@ -585,14 +585,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (zoomInBtn) zoomInBtn.onclick = (e) => { e.preventDefault(); panScale = Math.min(panScale * 1.2, 4); setMapTransform(); };
         if (zoomOutBtn) zoomOutBtn.onclick = (e) => { e.preventDefault(); panScale = Math.max(panScale / 1.2, 0.5); setMapTransform(); };
     }
-     
+
     // --- START: CHARACTER SELECTION LOGIC ---
     function initCharacterScene() {
         if (isSceneInitialized) return;
         threeScene = new THREE.Scene();
         const aspectRatio = characterCanvasContainer.clientWidth / characterCanvasContainer.clientHeight;
-        threeCamera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 1000); 
-        
+        threeCamera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 1000);
+
         threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         threeRenderer.setSize(characterCanvasContainer.clientWidth, characterCanvasContainer.clientHeight);
         threeRenderer.setPixelRatio(window.devicePixelRatio);
@@ -610,11 +610,11 @@ document.addEventListener('DOMContentLoaded', function () {
         threeScene.add(dirLight);
 
         threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
-        
+
         window.addEventListener('resize', onWindowResize, false);
         isSceneInitialized = true;
     }
-    
+
     function onWindowResize() {
         if (!threeRenderer || !threeCamera) return;
         threeCamera.aspect = characterCanvasContainer.clientWidth / characterCanvasContainer.clientHeight;
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function switchToCharacterView() {
         isMapView = false;
         clearScene();
-        
+
         // MODIFICATION: Remove fullscreen class for character view
         if (characterSelectionPage) {
             characterSelectionPage.classList.remove('map-view-active');
@@ -671,15 +671,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function switchToMapView() {
-        if (isMapView) return; 
+        if (isMapView) return;
         isMapView = true;
         clearScene();
-        
+
         // MODIFICATION: Add fullscreen class for map view
         if (characterSelectionPage) {
             characterSelectionPage.classList.add('map-view-active');
         }
-        
+
         if (loadMapIcon) loadMapIcon.className = 'fas fa-map-location-dot';
 
         updateSideMenuState();
@@ -687,11 +687,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const loader = new GLTFLoader();
         loader.load('models/school/map.gltf', (gltf) => {
             currentModel = gltf.scene;
-            
+
             const box = new THREE.Box3().setFromObject(currentModel);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
-            
+
             // Center the model's geometry at the world origin
             currentModel.position.sub(center);
             threeScene.add(currentModel);
@@ -705,18 +705,18 @@ document.addEventListener('DOMContentLoaded', function () {
             threeControls.enablePan = true;
             threeControls.minDistance = 10;
             threeControls.maxDistance = 200;
-            
+
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = threeCamera.fov * (Math.PI / 180);
             const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-            
+
             // Position the camera relative to the new, adjusted target
             threeCamera.position.set(
                 targetOffset.x,
                 size.y * 1.1, // A slightly adjusted height
                 targetOffset.z + cameraZ * 1.25 // A bit further back to ensure it fits
             );
-            
+
             threeControls.update();
 
         }, undefined, (error) => {
@@ -732,8 +732,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const box = new THREE.Box3().setFromObject(currentModel);
             const center = box.getCenter(new THREE.Vector3());
             // FIX: Correctly center the model at the origin
-            currentModel.position.sub(center); 
-            
+            currentModel.position.sub(center);
+
             const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
             currentModel.scale.set(scale, scale, scale);
             threeScene.add(currentModel);
@@ -780,7 +780,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showPage(menuPage);
         });
     }
-    
+
     if (nextCharBtn) {
         nextCharBtn.addEventListener('click', () => {
             if (!isMapView && currentCharacterIndex < characterModels.length - 1) {
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     if (prevCharBtn) {
         prevCharBtn.addEventListener('click', () => {
             if (!isMapView && currentCharacterIndex > 0) {
@@ -798,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     if (backFrom3DCampusBtn) {
         backFrom3DCampusBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -809,29 +809,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const handlePlaceholderClick = (e) => { e.preventDefault(); const lang = localStorage.getItem('language') || 'en'; window.showMessage('info', window.translations[lang].popupNoticeTitle, window.translations[lang].popupFeatureComingSoon, window.translations[lang].popupOkButton); };
     const placeholderButtons = [charPlaceholder2];
     placeholderButtons.forEach(button => { if (button) { button.addEventListener('click', handlePlaceholderClick); } });
-    
+
     // --- END: CHARACTER SELECTION LOGIC ---
 
     function initializeApp() {
         const savedLang = localStorage.getItem('language') || 'en';
-        if(languageSelect) languageSelect.value = savedLang;
+        if (languageSelect) languageSelect.value = savedLang;
         setLanguage(savedLang);
 
-        const savedFont = localStorage.getItem('selectedFont') || 'Poppins'; 
-        if (fontChanger) fontChanger.value = savedFont; 
+        const savedFont = localStorage.getItem('selectedFont') || 'Poppins';
+        if (fontChanger) fontChanger.value = savedFont;
         applyFont(savedFont);
 
-        const savedZoom = localStorage.getItem('globalZoom') || '100'; 
-        if (zoomSlider) zoomSlider.value = savedZoom; 
+        const savedZoom = localStorage.getItem('globalZoom') || '100';
+        if (zoomSlider) zoomSlider.value = savedZoom;
         applyZoom(savedZoom);
 
-        const savedTheme = localStorage.getItem('themeGradient'); 
+        const savedTheme = localStorage.getItem('themeGradient');
         applyTheme(savedTheme || 'linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%)');
 
-        const prefersDark = localStorage.getItem('darkMode') === 'enabled'; 
-        if (darkModeCheckbox) darkModeCheckbox.checked = prefersDark; 
+        const prefersDark = localStorage.getItem('darkMode') === 'enabled';
+        if (darkModeCheckbox) darkModeCheckbox.checked = prefersDark;
         updateDarkMode(prefersDark);
-        
+
         showPage(initialPageContent);
     }
 
