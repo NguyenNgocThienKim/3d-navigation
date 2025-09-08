@@ -25,11 +25,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const backgroundMusic = document.getElementById('backgroundMusic');
     const volumeSlider = document.getElementById('volumeSlider');
     const backButtonFrom2D = document.getElementById('backButtonFrom2D');
+    const mapPageSettingsButton = document.getElementById('mapPageSettingsButton');
 
     const enterUniversityButton = document.getElementById('enterUniversityButton');
 
     // --- Info Popup (About) Elements ---
     const infoPopupContainer = document.getElementById('info-popup-container');
+    const infoPopupContentWrapper = document.getElementById('info-popup-content-wrapper');
     const infoPopupCloseBtn = document.getElementById('info-popup-close-btn');
     const infoPopupNextBtn = document.getElementById('info-popup-next-btn');
     const infoPopupPrevBtn = document.getElementById('info-popup-prev-btn');
@@ -53,8 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Map Pan & Zoom Elements ---
     const mapAreaWrapperEl = document.querySelector('.map-area-wrapper');
     const mapContentEl = document.getElementById('map-content-area');
-    const zoomInBtn = document.getElementById('zoomInButton');
-    const zoomOutBtn = document.getElementById('zoomOutButton');
+    const mapImageEl = document.querySelector('.map-image-2d');
 
     // --- Menu Buttons ---
     const welcomeButton = document.getElementById('welcomeButton');
@@ -65,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Welcome Popup Elements ---
     const welcomePopupContainer = document.getElementById('welcome-popup-container');
+    const welcomePopupContentWrapper = document.getElementById('welcome-popup-content-wrapper');
     const welcomePopupCloseBtn = document.getElementById('welcome-popup-close-btn');
     const welcomePopupNextBtn = document.getElementById('welcome-popup-next-btn');
     const welcomePopupPrevBtn = document.getElementById('welcome-popup-prev-btn');
@@ -79,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectCharBtn = document.getElementById('select-char-btn');
     const loadMapBtn = document.getElementById('loadmap-btn');
     const charPlaceholder2 = document.getElementById('char-placeholder-2');
+    const charFullscreenBtn = document.getElementById('char-fullscreen-btn');
     const charBackToMenuBtn = document.getElementById('char-back-to-menu-btn');
     const loadMapIcon = loadMapBtn ? loadMapBtn.querySelector('i') : null;
 
@@ -133,6 +136,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (pageElement) {
             pageElement.style.display = 'flex';
+        }
+
+        // Reset map transform when showing the 2D map page
+        if (pageElement === map2DPage) {
+             // Use a timeout to ensure the browser has rendered the page layout
+            setTimeout(() => {
+                if (mapImageEl.complete) {
+                    resetMapTransform();
+                } else {
+                    mapImageEl.onload = resetMapTransform;
+                }
+            }, 0);
         }
 
         // Correctly initialize or resume the animation when returning to the 3D page
@@ -256,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "1952년에 설립된 라구나 주립 폴리테크닉 대학교(LSPU)는 바이바이 지방 고등학교로 시작하여 2007년 공화국법 제9402호에 따라 현재의 대학 지위로 발전했습니다. 고등교육위원회(CHED)와 공인대학인증기관(AACCUP)의 인정을 받은 공립 비영리 기관으로, 여러 캠퍼스를 통해 다양한 학부 및 대학원 프로그램을 제공합니다.",
             welcomeHistory2: "LSPU는 정직, 전문성, 혁신이라는 가치를 바탕으로 양질의 교육, 연구, 지역사회 봉사에 전념하고 있습니다. 메인 캠퍼스는 라구나 주 산타크루즈에 위치하고 있으며, 산파블로 시, 로스바뇨스, 시닐로안에 정규 분교 캠퍼스가 있고 막달레나, 나그칼란, 릴리우, 로페즈에 위성 캠퍼스가 있습니다.",
             welcomeHistory3: "기술 혁신의 중심지로서 LSPU는 지역 내 강력한 파트너십을 통해 학제 간 학습과 지속 가능한 발전을 촉진합니다. 이 대학은 약 35,000명의 학부생과 2,000명의 대학원생, 그리고 약 300-400명의 교수진을 보유하고 있습니다.",
-            welcomePopupMVTitle: "사명과 비전", welcomePopupMissionTitle: "사명", welcomePopupMissionText: "LSPU는 진보적인 리더십에 의해 운영되며, 기술 매개 농업, 어업 및 기타 관련 신흥 분야를 제공하는 최고의 기관으로서 지역 및 국가의 성장과 발전에 크게 기여합니다.", welcomePopupVisionTitle: "비전", welcomePopupVisionText: "LSPU는 학제 간 학습, 자원의 지속 가능한 활용, 그리고 커뮤니티 및 이해관계자와의 협력 및 파트너십을 촉진하는 기술 혁신의 중심지입니다."
+            welcomePopupMVTitle: "사명과 비전", welcomePopupMissionTitle: "사명", welcomePopupMissionText: "LSPU는 진보적인 리더십에 의해 운영되며, 기술 매개 농업, 어업 및 기타 관련 신흥 분야를 제공하는 최고의 기관으로서 지역 및 국가의 성장과 발전에 크게 기여합니다.", welcomePopupVisionTitle: "비전", welcomePopupVisionText: "LSPU는 학제 간 학습, 자원의 지속 가능한 활용, 그리고 커뮤니티 및 이해관계자와의 협력 및 파트너십을 촉진하는 기술 혁신의 중심지입니다。"
         },
         ja: {
             settingsTitle: "設定", soundLabel: "音量", zoomLabel: "ズーム", darkModeLabel: "ダークモード", themeLabel: "テーマ", fontLabel: "フォント", languageLabel: "言語", accountLabel: "アカウント", settingsBackToMain: "メインに戻る",
@@ -268,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingTextStudent: "仮想キャンパスに登録しています...", loadingTextVisitor: "ツアーを準備しています...",
             loadingWelcomeStudent: "サンパブロ市のLSPUキャンパスへようこそ！大学内を楽しく散策してください！道に迷っても大丈夫です！キャンパスを歩き回り、友達とリラックスできる最高の場所を見つけてください！",
             loadingWelcomeVisitor: "ラグナ州立工科大学 – サンパブロ市キャンパスへようこそ！自由に探索して、私たちの大学の敷地を知ってください。イベント、会議、または簡単なツアーのためにここにいるかどうかにかかわらず、私たちの3Dマップがあなたをあらゆる段階でご案内します！",
-            aboutIntro: "大学の3Dナビゲーションシステムへようこそ – LSPU、サンパブロ市。学生、教職員、訪問者が大学の環境を探索し、対話する方法を強化するために設計された先駆的なデジタルイニシアチブです。",
+            aboutIntro: "大学の3Dナビゲーションシステムへようこそ – LSPU、サンパブロ市。学生、教職員、訪問者が大学の環境を探索し、対話する方法を強化するために設計された先駆적인デジタルイニシアチブです。",
             aboutObjectivesTitle: "プロジェクトの目的", aboutObjectivesText: "このプロジェクトは、ユーザーが大学全体の学術棟、オフィス、学部を効率的に見つけるのを支援することにより、キャンパスのナビゲーションを簡素化することを目的としています。また、仮想キャンパスツアーを可能にし、将来の学生、保護者、リモートユーザーが学校の敷地をデジタルで探索できるようにすることも目指しています。もう1つの重要な目的は、没入型の3D表現を通じて主要なインフラストラクチャと設備を強調表示することにより、大学の施設を紹介することです。最後に、このプロジェクトは、現代技術を管理サービスと教育サービスの両方に統合することにより、デジタル変換という機関の目標に貢献します。",
             aboutFeaturesTitle: "主な機能", aboutFeaturesText: "3Dキャンパスナビゲーションシステムには、ユーザーが効率的にナビゲートするのに役立つ経路探索機能を備えたインタラクティブな3Dマップが含まれています。安全なログインシステムにより、学生と訪問者の両方がアクセスでき、カスタマイズ可能なインターフェースは、ユーザーエクスペリエンスを向上させるためにテーマ、フォント、ダーク/ライトモードのオプションをサポートしています。このプラットフォームは多言語サポートも提供しており、現在、英語、フィリピン語、韓国語、日本語、ベトナム語、中国語、スペイン語、ポルトガル語で利用できます。レスポンシブレイアウトで設計されたこのシステムは、デスクトップデバイスとモバイルデバイスの両方で完全に機能します。追加機能には、ユーザーの入力を収集するためのフィードバックシステムや、特定の部屋や建物に関する詳細な洞察を表示する動的な情報パネルが含まれます。",
             aboutDevsTitle: "開発者", aboutDevsIntro: "このプロジェクトは、以下の学生研究者によって構想および開発されました。",
@@ -323,9 +338,9 @@ document.addEventListener('DOMContentLoaded', function () {
             characterSelected: "¡Personaje seleccionado! Ahora procederás al campus.",
             welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar",
             loadingTextStudent: "Inscribiéndote en el campus virtual...", loadingTextVisitor: "Preparando tu recorrido...",
-            loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el mejor lugar para relajarte con tus amigos!",
+            loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte con tus amigos!",
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nuestra universidad. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
-            aboutIntro: "Bienvenido al Sistema de Navegación 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
+            aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
             aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representaciones 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
             aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fuente y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
             aboutDevsTitle: "Desarrolladores", aboutDevsIntro: "Este proyecto fue conceptualizado y desarrollado por los siguientes estudiantes investigadores:",
@@ -394,10 +409,26 @@ document.addEventListener('DOMContentLoaded', function () {
     function applyFont(fontName) { document.documentElement.style.setProperty('--main-font-family', `'${fontName}', sans-serif`); localStorage.setItem('selectedFont', fontName); }
     function applyZoom(zoomValue) { document.documentElement.style.fontSize = `${zoomValue}%`; localStorage.setItem('globalZoom', zoomValue); }
 
+    const toggleSettingsPanel = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (settingsPanel) settingsPanel.classList.toggle('active');
+    };
+    
     if (settingsToggleButton) {
-        settingsToggleButton.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); if (settingsPanel) settingsPanel.classList.toggle('active'); });
-        document.addEventListener('click', (e) => { if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== settingsToggleButton) { settingsPanel.classList.remove('active'); } });
+        settingsToggleButton.addEventListener('click', toggleSettingsPanel);
     }
+    if (mapPageSettingsButton) {
+        mapPageSettingsButton.addEventListener('click', toggleSettingsPanel);
+    }
+    
+    document.addEventListener('click', (e) => {
+        const isSettingsButton = e.target.closest('#settingsToggleButton') || e.target.closest('#mapPageSettingsButton');
+        if (settingsPanel && !settingsPanel.contains(e.target) && !isSettingsButton) {
+            settingsPanel.classList.remove('active');
+        }
+    });
+
     if (darkModeCheckbox) { darkModeCheckbox.addEventListener('change', (e) => updateDarkMode(e.target.checked)); }
     if (colorSwatches) { colorSwatches.forEach(swatch => swatch.addEventListener('click', () => applyTheme(swatch.dataset.color))); }
     if (fontChanger) { fontChanger.addEventListener('change', e => applyFont(e.target.value)); }
@@ -425,7 +456,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (hexagon2DButton) { hexagon2DButton.addEventListener('click', e => { e.preventDefault(); showPage(map2DPage); }); }
+    if (hexagon2DButton) {
+        hexagon2DButton.addEventListener('click', e => {
+            e.preventDefault();
+            showPage(map2DPage);
+        });
+    }
 
     function updateInfoPages() {
         infoPages.forEach((page, index) => {
@@ -559,32 +595,195 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    // START: 2D MAP INTERACTION LOGIC
+    let mapState = { scale: 1, transform: { x: 0, y: 0 } };
 
-    pinData.forEach(data => {
-        const pinElement = document.getElementById(`pin-${data.id}`);
-        if (pinElement) {
-            pinElement.addEventListener('click', () => {
-                showPinInfoPopup(data);
-            });
+    function setTransform() {
+        mapContentEl.style.transform = `translate(${mapState.transform.x}px, ${mapState.transform.y}px) scale(${mapState.scale})`;
+    }
+
+    function resetMapTransform() {
+        const wrapperWidth = mapAreaWrapperEl.clientWidth;
+        const wrapperHeight = mapAreaWrapperEl.clientHeight;
+        const contentWidth = mapImageEl.offsetWidth;
+        const contentHeight = mapImageEl.offsetHeight;
+
+        const scaleX = wrapperWidth / contentWidth;
+        const scaleY = wrapperHeight / contentHeight;
+        
+        mapState.scale = Math.min(scaleX, scaleY) * 0.95; // Use 0.95 for a tighter fit
+        mapState.transform.x = (wrapperWidth - contentWidth * mapState.scale) / 2;
+        mapState.transform.y = (wrapperHeight - contentHeight * mapState.scale) / 2;
+
+        setTransform();
+    }
+    
+    window.addEventListener('resize', () => {
+        if(map2DPage.style.display === 'flex') {
+            resetMapTransform();
         }
     });
 
+
     if (mapAreaWrapperEl && mapContentEl) {
-        let panScale = 1, panPanning = false, panStart = { x: 0, y: 0 }, panTransform = { x: 0, y: 0 };
-        const setMapTransform = () => { mapContentEl.style.transform = `translate(${panTransform.x}px, ${panTransform.y}px) scale(${panScale})`; };
-        const handlePanStart = (clientX, clientY) => { panStart = { x: clientX - panTransform.x, y: clientY - panTransform.y }; panPanning = true; };
-        const handlePanMove = (clientX, clientY) => { if (!panPanning) return; panTransform.x = clientX - panStart.x; panTransform.y = clientY - panStart.y; setMapTransform(); };
-        const handlePanEnd = () => { panPanning = false; };
-        mapAreaWrapperEl.onmousedown = (e) => { e.preventDefault(); handlePanStart(e.clientX, e.clientY); };
-        mapAreaWrapperEl.onmousemove = (e) => { e.preventDefault(); handlePanMove(e.clientX, e.clientY); };
-        mapAreaWrapperEl.onmouseup = handlePanEnd; mapAreaWrapperEl.onmouseleave = handlePanEnd;
-        mapAreaWrapperEl.ontouchstart = (e) => { e.preventDefault(); const touch = e.touches[0]; handlePanStart(touch.clientX, touch.clientY); };
-        mapAreaWrapperEl.ontouchmove = (e) => { e.preventDefault(); const touch = e.touches[0]; handlePanMove(touch.clientX, touch.clientY); };
-        mapAreaWrapperEl.ontouchend = handlePanEnd; mapAreaWrapperEl.ontouchcancel = handlePanEnd;
-        mapAreaWrapperEl.onwheel = (e) => { e.preventDefault(); const rect = mapAreaWrapperEl.getBoundingClientRect(); const xs = (e.clientX - rect.left - panTransform.x) / panScale; const ys = (e.clientY - rect.top - panTransform.y) / panScale; const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY); (delta > 0) ? (panScale *= 1.2) : (panScale /= 1.2); panScale = Math.min(Math.max(0.5, panScale), 4); panTransform.x = e.clientX - rect.left - xs * panScale; panTransform.y = e.clientY - rect.top - ys * panScale; setMapTransform(); };
-        if (zoomInBtn) zoomInBtn.onclick = (e) => { e.preventDefault(); panScale = Math.min(panScale * 1.2, 4); setMapTransform(); };
-        if (zoomOutBtn) zoomOutBtn.onclick = (e) => { e.preventDefault(); panScale = Math.max(panScale / 1.2, 0.5); setMapTransform(); };
+        let isPanning = false;
+        let isPinching = false;
+        let start = { x: 0, y: 0 };
+        let initialPinchDistance = 0;
+        const activePointers = new Map();
+
+        const getDistance = (p1, p2) => Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+        const getMidpoint = (p1, p2) => ({ x: (p1.clientX + p2.clientX) / 2, y: (p1.clientY + p2.clientY) / 2 });
+
+        mapAreaWrapperEl.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+            if (activePointers.size === 1) {
+                isPanning = true;
+                start = { x: e.clientX - mapState.transform.x, y: e.clientY - mapState.transform.y };
+            } else if (activePointers.size === 2) {
+                isPanning = false;
+                isPinching = true;
+                initialPinchDistance = getDistance(...activePointers.values());
+            }
+        });
+
+        mapAreaWrapperEl.addEventListener('pointermove', (e) => {
+            e.preventDefault();
+            if (!activePointers.has(e.pointerId)) return;
+            activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+            if (isPanning && activePointers.size === 1) {
+                mapState.transform.x = e.clientX - start.x;
+                mapState.transform.y = e.clientY - start.y;
+                setTransform();
+            } else if (isPinching && activePointers.size === 2) {
+                const pointers = [...activePointers.values()];
+                const newDist = getDistance(pointers[0], pointers[1]);
+                const sensitivity = 0.5; // Adjust this value to make zoom less sensitive
+                const scaleMultiplier = 1 + ((newDist / initialPinchDistance) - 1) * sensitivity;
+                
+                const midpoint = getMidpoint(pointers[0], pointers[1]);
+                const rect = mapAreaWrapperEl.getBoundingClientRect();
+                
+                const xs = (midpoint.x - rect.left - mapState.transform.x) / mapState.scale;
+                const ys = (midpoint.y - rect.top - mapState.transform.y) / mapState.scale;
+                
+                const newScale = Math.min(Math.max(0.2, mapState.scale * scaleMultiplier), 4);
+                
+                mapState.transform.x = midpoint.x - rect.left - xs * newScale;
+                mapState.transform.y = midpoint.y - rect.top - ys * newScale;
+                mapState.scale = newScale;
+
+                setTransform();
+                initialPinchDistance = newDist;
+            }
+        });
+
+        const handlePointerEnd = (e) => {
+            activePointers.delete(e.pointerId);
+            if (activePointers.size < 2) {
+                isPinching = false;
+            }
+            if (activePointers.size < 1) {
+                isPanning = false;
+            } else if (activePointers.size === 1) {
+                 isPanning = true;
+                 const pointer = [...activePointers.values()][0];
+                 start = { x: pointer.clientX - mapState.transform.x, y: pointer.clientY - mapState.transform.y };
+            }
+        };
+
+        mapAreaWrapperEl.addEventListener('pointerup', handlePointerEnd);
+        mapAreaWrapperEl.addEventListener('pointercancel', handlePointerEnd);
+        mapAreaWrapperEl.addEventListener('pointerleave', handlePointerEnd);
+
+        mapAreaWrapperEl.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = mapAreaWrapperEl.getBoundingClientRect();
+            const xs = (e.clientX - rect.left - mapState.transform.x) / mapState.scale;
+            const ys = (e.clientY - rect.top - mapState.transform.y) / mapState.scale;
+            const delta = (e.deltaY > 0) ? 0.85 : 1.15;
+            const newScale = Math.min(Math.max(0.2, mapState.scale * delta), 4);
+            mapState.transform.x = e.clientX - rect.left - xs * newScale;
+            mapState.transform.y = e.clientY - rect.top - ys * newScale;
+            mapState.scale = newScale;
+            setTransform();
+        });
     }
+    
+    // --- Mobile Pin Tap Fix ---
+    pinData.forEach(data => {
+        const pinElement = document.getElementById(`pin-${data.id}`);
+        if (pinElement) {
+            let isPinDragging = false;
+            let pinPressStartTime = 0;
+            
+            pinElement.addEventListener('pointerdown', (e) => {
+                e.stopPropagation(); // Prevent map from panning
+                isPinDragging = false;
+                pinPressStartTime = Date.now();
+            });
+
+            pinElement.addEventListener('pointermove', (e) => {
+                isPinDragging = true;
+            });
+
+            pinElement.addEventListener('pointerup', (e) => {
+                e.stopPropagation();
+                const pressDuration = Date.now() - pinPressStartTime;
+                if (!isPinDragging && pressDuration < 250) { // It's a tap!
+                    showPinInfoPopup(data);
+                }
+            });
+        }
+    });
+    // END: 2D MAP INTERACTION LOGIC
+
+    // START: Drag-to-scroll for popups
+    function enableDragToScroll(element) {
+        if (!element) return;
+
+        let isDown = false;
+        let startY;
+        let scrollTop;
+
+        element.addEventListener('pointerdown', (e) => {
+            // Only activate for touch and mouse left-click
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            isDown = true;
+            element.classList.add('content-wrapper-active-drag');
+            startY = e.pageY - element.offsetTop;
+            scrollTop = element.scrollTop;
+            element.style.scrollBehavior = 'auto'; // Disable smooth scroll during drag
+        });
+
+        const stopDragging = () => {
+            isDown = false;
+            element.classList.remove('content-wrapper-active-drag');
+            element.style.scrollBehavior = 'smooth'; // Re-enable after drag
+        };
+
+        element.addEventListener('pointerleave', stopDragging);
+        element.addEventListener('pointerup', stopDragging);
+        element.addEventListener('pointercancel', stopDragging);
+
+
+        element.addEventListener('pointermove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const y = e.pageY - element.offsetTop;
+            const walk = (y - startY);
+            element.scrollTop = scrollTop - walk;
+        });
+    }
+
+    enableDragToScroll(welcomePopupContentWrapper);
+    enableDragToScroll(infoPopupContentWrapper);
+    // END: Drag-to-scroll for popups
+
 
     // --- START: CHARACTER SELECTION LOGIC ---
     function initCharacterScene() {
@@ -798,6 +997,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    if (charFullscreenBtn) {
+        charFullscreenBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!document.fullscreenElement) {
+                characterSelectionPage.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    }
+    
+    document.addEventListener('fullscreenchange', () => {
+        const icon = charFullscreenBtn.querySelector('i');
+        if (document.fullscreenElement) {
+            icon.classList.remove('fa-expand');
+            icon.classList.add('fa-compress');
+        } else {
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
+        }
+        // A short timeout allows the browser to finish the transition
+        setTimeout(onWindowResize, 100);
+    });
 
     if (backFrom3DCampusBtn) {
         backFrom3DCampusBtn.addEventListener('click', (e) => {

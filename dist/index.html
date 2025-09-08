@@ -25,6 +25,9 @@
       }
     }
   </script>
+  <!-- Ionicons Script -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
 
@@ -158,9 +161,9 @@
             </div>
             <div class="hexagon-menu">
                 <a href="#" class="hexagon hexagon-welcome" id="welcomeButton"><div class="hexagon-icon"><i class="fas fa-door-open"></i></div><span class="hexagon-text" data-lang-key="menuWelcome">WELCOME</span></a>
-                <a href="#" class="hexagon" id="aboutButton"><div class="hexagon-icon"><i class="fas fa-info-circle"></i></div><span class="hexagon-text" data-lang-key="menuAbout">ABOUT</span></a>
+                <a href="#" class="hexagon" id="hexagon-3d-button"><div class="hexagon-icon"><ion-icon name="cube-sharp"></ion-icon></div><span class="hexagon-text" data-lang-key="menu3d">3D</span></a>
                 <a href="#" class="hexagon hexagon-shadowed" id="hexagon-2d-button"><div class="hexagon-icon"><i class="fas fa-map-marked-alt"></i></div><span class="hexagon-text" data-lang-key="menuMiniMap">Mini Map</span></a>
-                <a href="#" class="hexagon" id="hexagon-3d-button"><div class="hexagon-icon"><i class="fas fa-mobile-alt"></i></div><span class="hexagon-text" data-lang-key="menu3d">3D</span></a>
+                <a href="#" class="hexagon" id="aboutButton"><div class="hexagon-icon"><i class="fas fa-info-circle"></i></div><span class="hexagon-text" data-lang-key="menuAbout">ABOUT</span></a>
             </div>
             <div class="back-to-login-container">
                 <button id="backToLoginButton" class="back-to-login-button icon-button">
@@ -173,8 +176,9 @@
     </div>
 
     <div id="map-2d-page" class="page-container">
-        <div class="map-top-left-controls">
+        <div class="map-page-header">
             <a href="#" id="backButtonFrom2D" class="map-ui-button"><i class="fas fa-arrow-left"></i> <span data-lang-key="backButton">BACK</span></a>
+            <a href="#" id="mapPageSettingsButton" class="control-button" title="Settings"><i class="fas fa-cog"></i></a>
         </div>
         <div class="map-area-wrapper">
             <div id="map-content-area" class="map-content-area">
@@ -208,11 +212,6 @@
                 <!-- END: PIN LOCATIONS -->
             </div>
         </div>
-        <!-- Zoom controls moved outside of the map-area-wrapper -->
-        <div class="zoom-controls-container">
-            <a href="#" id="zoomInButton" class="zoom-button" title="Zoom In"><span><i class="fas fa-plus"></i></span></a>
-            <a href="#" id="zoomOutButton" class="zoom-button" title="Zoom Out"><span><i class="fas fa-minus"></i></span></a>
-        </div>
     </div>
     
     <!-- START: Character Selection Page -->
@@ -224,14 +223,15 @@
         </div>
        
         <div class="character-controls-bottom">
-            <button id="prev-char-btn" class="char-nav-arrow"><i class="fas fa-arrow-left"></i></button>
-            <button id="next-char-btn" class="char-nav-arrow"><i class="fas fa-arrow-right"></i></button>
+            <button id="prev-char-btn" class="char-nav-arrow"><i class="fa-solid fa-circle-left" style="color: #63E6BE;"></i></button>
+            <button id="next-char-btn" class="char-nav-arrow"><i class="fa-solid fa-circle-right" style="color: #63E6BE;"></i></button>
         </div>
 
         <div class="character-side-menu">
             <button id="select-char-btn" title="Character View"><i class="fas fa-user"></i></button>
             <button id="loadmap-btn" title="Map View"><i class="fas fa-map"></i></button>
             <button id="char-placeholder-2" title="Coming Soon"><i class="fas fa-map-marked-alt"></i></button>
+            <button id="char-fullscreen-btn" title="Toggle Fullscreen"><i class="fas fa-expand"></i></button>
             <button id="char-back-to-menu-btn" title="Back to Menu"><i class="fas fa-reply"></i></button>
         </div>
     </div>
@@ -384,7 +384,7 @@
                 <div id="welcome-page-2" class="welcome-page">
                     <div class="welcome-popup-content">
                          <div class="welcome-popup-image-container">
-                            <dotlottie-player src="https://lottie.host/3e2948da-5c25-48bb-9144-e1599d86eb46/dalgGzhPom.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player>
+                            <dotlottie-player src="https://lottie.host/52ab20c7-1716-49b0-8c4c-7b49ca43e189/dlJhDbY5gY.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player>
                         </div>
                         <div class="welcome-popup-text-container">
                             <h2 data-lang-key="welcomePopupMVTitle">Mission & Vision</h2>
