@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectCharBtn = document.getElementById('select-char-btn');
     const loadMapBtn = document.getElementById('loadmap-btn');
     const charPlaceholder2 = document.getElementById('char-placeholder-2');
+    const charToggleAnimationBtn = document.getElementById('char-toggle-animation-btn');
     const charFullscreenBtn = document.getElementById('char-fullscreen-btn');
     const charBackToMenuBtn = document.getElementById('char-back-to-menu-btn');
     const loadMapIcon = loadMapBtn ? loadMapBtn.querySelector('i') : null;
@@ -95,14 +96,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- CHARACTER SELECTION & THREE.JS VARIABLES ---
     let threeScene, threeCamera, threeRenderer, threeControls, currentModel;
+    let threeMixer, animationAction, threeClock;
     let isSceneInitialized = false;
     let currentCharacterIndex = 0;
     const characterModels = [
         'models/character/student1/girl.gltf',
-        'models/character/student2/boy.gltf',
+        'models/character/student2/Boy.gltf', // Case-sensitive filename
         'models/character/teacher/teacher.gltf'
     ];
-    let isMapView = false; // State to track if map is shown
+    let isMapView = false;
+    let isAnimationPlaying = true;
     let animationRequestId;
 
     if (backToLoginButton) {
@@ -326,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutFeaturesTitle: "Principais Características", aboutFeaturesText: "O sistema de navegação 3D do campus inclui um mapa 3D interativo equipado com capacidades de localização de caminhos para ajudar os usuários a navegar de forma eficiente. Um sistema de login seguro permite o acesso tanto para estudantes quanto para visitantes, enquanto uma interface personalizável suporta opções de tema, fonte e modo escuro/claro para aprimorar a experiência do usuário. A plataforma também oferece suporte multilíngue, atualmente disponível em inglês, filipino, coreano, japonês, vietnamita, chinês, espanhol e português. Projetado com um layout responsivo, o sistema é totalmente funcional em dispositivos de desktop e móveis. Recursos adicionais incluem um sistema de feedback para coletar a opinião do usuário e painéis de informações dinâmicos que exibem insights detalhados sobre salas e edifícios específicos.",
             aboutDevsTitle: "Desenvolvedores", aboutDevsIntro: "Este projeto foi idealizado e desenvolvido pelos seguintes estudantes pesquisadores:",
             welcomeHistory1: "A Universidade Politécnica Estadual de Laguna (LSPU), fundada em 1952, começou como Escola Secundária Provincial de Baybay e evoluiu para seu status universitário atual sob a Lei da República nº 9402 em 2007. É uma instituição pública, sem fins lucrativos, reconhecida pela Comissão de Educação Superior (CHED) e pela Agência de Credenciamento de Faculdades e Universidades (AACCUP), oferecendo uma variedade de programas de graduação e pós-graduação em seus múltiplos campi.",
-            welcomeHistory2: "A LSPU dedica-se à educação de qualidade, pesquisa e serviço comunitário, guiada por seus valores de integridade, profissionalismo e inovação. Seu campus principal está localizado em Santa Cruz, Laguna, com campi filiais regulares na cidade de San Pablo, Los Baños e Siniloan, além de campi satélites em Magdalena, Nagcarlan, Liliw e Lopez.",
+            welcomeHistory2: "A LSPU dedica-se à education de qualidade, pesquisa e serviço comunitário, guiada por seus valores de integridade, profissionalismo e inovação. Seu campus principal está localizado em Santa Cruz, Laguna, com campi filiais regulares na cidade de San Pablo, Los Baños e Siniloan, além de campi satélites em Magdalena, Nagcarlan, Liliw e Lopez.",
             welcomeHistory3: "Como um centro de inovação tecnológica, a LSPU promove o aprendizado interdisciplinar e o desenvolvimento sustentável por meio de fortes parcerias na região. A universidade atende aproximadamente 35,000 estudantes de graduação e 2,000 de pós-graduação, com cerca de 300 a 400 membros do corpo docente.",
             welcomePopupMVTitle: "Missão e Visão", welcomePopupMissionTitle: "MISSÃO", welcomePopupMissionText: "A LSPU, impulsionada por uma liderança progressista, é uma instituição de primeira linha que oferece agricultura mediada por tecnologia, pesca e outras disciplinas relacionadas e emergentes, contribuindo significativamente para o crescimento e desenvolvimento da região e da nação.", welcomePopupVisionTitle: "VISÃO", welcomePopupVisionText: "A LSPU é um centro de inovação tecnológica que promove o aprendizado interdisciplinar, a utilização sustentável de recursos e a colaboração e parceria com a comunidade e as partes interessadas."
         },
@@ -788,6 +791,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- START: CHARACTER SELECTION LOGIC ---
     function initCharacterScene() {
         if (isSceneInitialized) return;
+        threeClock = new THREE.Clock();
         threeScene = new THREE.Scene();
         const aspectRatio = characterCanvasContainer.clientWidth / characterCanvasContainer.clientHeight;
         threeCamera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 1000);
@@ -799,7 +803,6 @@ document.addEventListener('DOMContentLoaded', function () {
         threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
         characterCanvasContainer.appendChild(threeRenderer.domElement);
 
-        // FIX: Brighter, more even lighting
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2.5);
         hemiLight.position.set(0, 20, 0);
         threeScene.add(hemiLight);
@@ -823,6 +826,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function animateCharacterScene() {
         animationRequestId = requestAnimationFrame(animateCharacterScene);
+        const delta = threeClock.getDelta();
+        if (threeMixer) {
+            threeMixer.update(delta);
+        }
         threeControls.update();
         threeRenderer.render(threeScene, threeCamera);
     }
@@ -832,6 +839,11 @@ document.addEventListener('DOMContentLoaded', function () {
             threeScene.remove(currentModel);
             currentModel = null;
         }
+        if (threeMixer) {
+            threeMixer.uncacheRoot(threeMixer.getRoot());
+            threeMixer = null;
+            animationAction = null;
+        }
     }
 
     function updateSideMenuState() {
@@ -840,11 +852,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (selectCharBtn) selectCharBtn.classList.remove('active');
             if (prevCharBtn) prevCharBtn.style.display = 'none';
             if (nextCharBtn) nextCharBtn.style.display = 'none';
+            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'none'; // Hide anim button in map view
         } else {
             if (loadMapBtn) loadMapBtn.classList.remove('active');
             if (selectCharBtn) selectCharBtn.classList.add('active');
             if (prevCharBtn) prevCharBtn.style.display = 'flex';
             if (nextCharBtn) nextCharBtn.style.display = 'flex';
+            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'block'; // Show anim button in char view
         }
     }
 
@@ -852,7 +866,6 @@ document.addEventListener('DOMContentLoaded', function () {
         isMapView = false;
         clearScene();
 
-        // MODIFICATION: Remove fullscreen class for character view
         if (characterSelectionPage) {
             characterSelectionPage.classList.remove('map-view-active');
         }
@@ -874,7 +887,6 @@ document.addEventListener('DOMContentLoaded', function () {
         isMapView = true;
         clearScene();
 
-        // MODIFICATION: Add fullscreen class for map view
         if (characterSelectionPage) {
             characterSelectionPage.classList.add('map-view-active');
         }
@@ -891,13 +903,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
 
-            // Center the model's geometry at the world origin
             currentModel.position.sub(center);
             threeScene.add(currentModel);
 
-            // FIX: Adjust camera target and position for better framing
-            // The model's visual weight is not at its geometric center.
-            // We shift the camera's target to the right to compensate.
             const targetOffset = new THREE.Vector3(size.x * 0.15, 0, 0);
 
             threeControls.target.copy(targetOffset);
@@ -909,11 +917,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const fov = threeCamera.fov * (Math.PI / 180);
             const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-            // Position the camera relative to the new, adjusted target
             threeCamera.position.set(
                 targetOffset.x,
-                size.y * 1.1, // A slightly adjusted height
-                targetOffset.z + cameraZ * 1.25 // A bit further back to ensure it fits
+                size.y * 1.1,
+                targetOffset.z + cameraZ * 1.25
             );
 
             threeControls.update();
@@ -928,16 +935,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const loader = new GLTFLoader();
         loader.load(characterModels[index], (gltf) => {
             currentModel = gltf.scene;
+            
+            // Set up animations
+            if (gltf.animations && gltf.animations.length) {
+                threeMixer = new THREE.AnimationMixer(currentModel);
+                animationAction = threeMixer.clipAction(gltf.animations[0]); // Assuming first animation is walk
+                if (isAnimationPlaying) {
+                    animationAction.play();
+                }
+            }
+
             const box = new THREE.Box3().setFromObject(currentModel);
             const center = box.getCenter(new THREE.Vector3());
-            // FIX: Correctly center the model at the origin
             currentModel.position.sub(center);
 
             const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
             currentModel.scale.set(scale, scale, scale);
             threeScene.add(currentModel);
+
         }, undefined, (error) => {
-            console.error('An error happened while loading character:', error);
+            console.error(`An error happened while loading character: ${characterModels[index]}`, error);
         });
         prevCharBtn.disabled = index === 0;
         nextCharBtn.disabled = index === characterModels.length - 1;
@@ -951,6 +968,21 @@ document.addEventListener('DOMContentLoaded', function () {
             switchToCharacterView();
             if (!animationRequestId) {
                 animateCharacterScene();
+            }
+        });
+    }
+    
+    if (charToggleAnimationBtn) {
+        charToggleAnimationBtn.addEventListener('click', () => {
+            isAnimationPlaying = !isAnimationPlaying;
+            const icon = charToggleAnimationBtn.querySelector('i');
+
+            if (isAnimationPlaying) {
+                if (animationAction) animationAction.play();
+                icon.className = 'fa-regular fa-square-check';
+            } else {
+                if (animationAction) animationAction.stop();
+                icon.className = 'fa-regular fa-square';
             }
         });
     }
@@ -972,7 +1004,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (charBackToMenuBtn) {
         charBackToMenuBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // MODIFICATION: Ensure fullscreen class is removed when going back
             if (characterSelectionPage) {
                 characterSelectionPage.classList.remove('map-view-active');
             }
@@ -1018,7 +1049,6 @@ document.addEventListener('DOMContentLoaded', function () {
             icon.classList.remove('fa-compress');
             icon.classList.add('fa-expand');
         }
-        // A short timeout allows the browser to finish the transition
         setTimeout(onWindowResize, 100);
     });
 
