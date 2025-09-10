@@ -80,10 +80,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextCharBtn = document.getElementById('next-char-btn');
     const selectCharBtn = document.getElementById('select-char-btn');
     const loadMapBtn = document.getElementById('loadmap-btn');
-    const charPlaceholder2 = document.getElementById('char-placeholder-2');
     const charToggleAnimationBtn = document.getElementById('char-toggle-animation-btn');
     const charFullscreenBtn = document.getElementById('char-fullscreen-btn');
     const charBackToMenuBtn = document.getElementById('char-back-to-menu-btn');
+    const toolMenuToggleBtn = document.getElementById('tool-menu-toggle-btn');
+    const toolMenuContainer = document.querySelector('.character-side-menu-container');
     const loadMapIcon = loadMapBtn ? loadMapBtn.querySelector('i') : null;
 
 
@@ -101,12 +102,13 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentCharacterIndex = 0;
     const characterModels = [
         'models/character/student1/girl.gltf',
-        'models/character/student2/Boy.gltf', // Case-sensitive filename
+        'models/character/student2/Boy.gltf',
         'models/character/teacher/teacher.gltf'
     ];
     let isMapView = false;
     let isAnimationPlaying = true;
     let animationRequestId;
+    let defaultMapState = {}; // To store default map view camera state
 
     if (backToLoginButton) {
         backToLoginButton.addEventListener('click', (e) => {
@@ -231,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeVisitor: "Maligayang pagdating sa Laguna State Polytechnic University – San Pablo City Campus! Huwag mag-atubiling mag-explore at kilalanin ang aming unibersidad. Kung ikaw ay narito para sa isang kaganapan, pulong, o isang mabilis na paglilibot, narito ang aming 3D map para gabayan ka sa bawat hakbang!",
             aboutIntro: "Maligayang pagdating sa 3D Navigation System ng Unibersidad – LSPU, Lungsod ng San Pablo. Isang paunang digital na inisyatiba na idinisenyo upang mapabuti ang paraan ng pagtuklas at pakikipag-ugnayan ng mga mag-aaral, guro, at bisita sa kapaligiran ng unibersidad.",
             aboutObjectivesTitle: "Mga Layunin ng Proyekto", aboutObjectivesText: "Nilalayon ng proyektong ito na gawing simple ang nabigasyon sa kampus sa pamamagitan ng pagtulong sa mga gumagamit na mahanap nang mahusay ang mga gusaling pang-akademiko, opisina, at departamento sa buong unibersidad. Nilalayon din nitong paganahin ang mga virtual na paglilibot sa kampus, na nagpapahintulot sa mga prospective na mag-aaral, magulang, at mga remote user na digital na tuklasin ang mga bakuran ng paaralan. Isa pang pangunahing layunin ay ipakita ang mga pasilidad ng unibersidad sa pamamagitan ng pag-highlight sa mga pangunahing imprastraktura at kagamitan sa pamamagitan ng mga nakaka-engganyong 3D na representasyon. Panghuli, ang proyekto ay nag-aambag sa institutional na layunin ng digital transformation sa pamamagitan ng pagsasama ng modernong teknolohiya sa parehong mga serbisyong administratibo at pang-edukasyon.",
-            aboutFeaturesTitle: "Mga Pangunahing Tampok", aboutFeaturesText: "Kasama sa 3D campus navigation system ang isang interactive na 3D na mapa na may mga kakayahan sa paghahanap ng landas upang matulungan ang mga gumagamit na mag-navigate nang mahusay. Ang isang secure na sistema ng pag-login ay nagbibigay-daan sa pag-access para sa parehong mga mag-aaral at bisita, habang ang isang nako-customize na interface ay sumusuporta sa mga opsyon sa tema, font, at dark/light mode upang mapahusay ang karanasan ng gumagamit. Nag-aalok din ang platform ng suporta sa maraming wika, kasalukuyang magagamit sa Ingles, Filipino, Korean, Japanese, Vietnamese, Chinese, Spanish, at Portuguese. Dinisenyo na may tumutugong layout, ang sistema ay ganap na gumagana sa parehong desktop at mobile device. Kasama sa mga karagdagang tampok ang isang feedback system para sa pagkolekta ng input ng gumagamit at mga dynamic na panel ng impormasyon na nagpapakita ng detalyadong mga insight tungkol sa mga partikular na silid at gusali.",
+            aboutFeaturesTitle: "Mga Pangunahing Tampok", aboutFeaturesText: "Kasama sa 3D campus navigation system ang isang interactive na 3D na mapa na may mga kakayahan sa paghahanap ng landas upang matulungan ang mga gumagamit na mag-navigate nang mahusay. Ang isang secure na sistema ng pag-login ay nagbibigay-daan sa pag-access para sa parehong mga mag-aaral at bisita, habang ang isang nako-customize na interface ay sumusuporta sa mga opsyon sa tema, font, at dark/light mode upang mapahusay ang karanasan ng gumagamit. Nag-aalok din ang platform ng suporta sa maraming wika, kasalukuyang magagamit sa Ingles, Filipino, Korean, Japanese, Vietnamese, Chinese, Spanish, at Portuguese. Dinisenyo na may tumutugong layout, ang sistema ay ganap na gumagana sa parehong desktop at mobile device. Kasama sa mga kardagdagang tampok ang isang feedback system para sa pagkolekta ng input ng gumagamit at mga dynamic na panel ng impormasyon na nagpapakita ng detalyadong mga insight tungkol sa mga partikular na silid at gusali.",
             aboutDevsTitle: "Mga Developer", aboutDevsIntro: "Ang proyektong ito ay binuo at nilikha ng mga sumusunod na mag-aaral na mananaliksik:",
             welcomeHistory1: "Ang Laguna State Polytechnic University (LSPU), na itinatag noong 1952, ay nagsimula bilang Baybay Provincial High School at naging unibersidad sa ilalim ng Republic Act No. 9402 noong 2007. Ito ay isang pampubliko, non-profit na institusyon na kinikilala ng Commission on Higher Education (CHED) at ng Accrediting Agency of Chartered Colleges and Universities (AACCUP), na nag-aalok ng iba't ibang programa sa undergraduate at graduate sa pamamagitan ng maraming kampus nito.",
             welcomeHistory2: "Ang LSPU ay nakatuon sa dekalidad na edukasyon, pananaliksik, at serbisyo sa komunidad, na ginagabayan ng mga halaga nito ng integridad, propesyonalismo, at inobasyon. Ang pangunahing kampus nito ay matatagpuan sa Santa Cruz, Laguna, na may mga regular na branch campus sa Lungsod ng San Pablo, Los Baños, at Siniloan, kasama ang mga satellite campus sa Magdalena, Nagcarlan, Liliw, at Lopez.",
@@ -307,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeVisitor: "欢迎来到拉古纳理工州立大学 – 圣巴勃罗市校区！请随意探索和了解我们的大学校园。无论您是来参加活动、会议，还是只是快速游览，我们的3D地图都会为您提供每一步的指引！",
             aboutIntro: "欢迎来到大学3D导航系统 – LSPU，圣巴勃罗市。这是一个开创性的数字计划，旨在增强学生、教职员工和访客探索大学环境并与之互动的方式。",
             aboutObjectivesTitle: "项目目标", aboutObjectivesText: "该项目旨在通过协助用户高效地定位整个大学的教学楼、办公室和系部来简化校园导航。它还致力于实现虚拟校园参观，允许未来的学生、家长和远程用户以数字方式探索校园。另一个关键目标是通过沉浸式3D表现形式突出主要基础设施和便利设施，展示大学设施。最后，该项目通过将现代技术整合到行政和教育服务中，为机构的数字化转型目标做出贡献。",
-            aboutFeaturesTitle: "主要特点", aboutFeaturesText: "3D校园导航系统包括一个交互式3D地图，配备了寻路功能，以帮助用户高效导航。安全的登录系统允许学生和访客访问，而可定制的界面支持主题、字体和暗/亮模式选项，以增强用户体验。该平台还提供多语言支持，目前支持英语、菲律宾语、韩语、日语、越南语、中文、西班牙语和葡萄牙语。该系统采用响应式布局设计，完全可在台式机和移动设备上运行。其他功能包括一个用于收集用户输入的反馈系统，以及显示有关特定房间和建筑物的详细见解的动态信息面板。",
+            aboutFeaturesTitle: "主要特点", aboutFeaturesText: "3D校园导航系统包括一个交互式3D地图，配备了寻路功能，以帮助用户高效导航。安全的登录系统允许学生和访客访问，而可定制的界面支持主题、字体和暗/亮模式选项，以增强用户体验。该平台还提供多语言支持，目前支持英语、菲律リピン语、韩语、日语、越南语、中文、西班牙语和葡萄牙语。该系统采用响应式布局设计，完全可在台式机和移动设备上运行。其他功能包括一个用于收集用户输入的反馈系统，以及显示有关特定房间和建筑物的详细见解的动态信息面板。",
             aboutDevsTitle: "开发者", aboutDevsIntro: "该项目由以下学生研究人员构思和开发：",
             welcomeHistory1: "拉古纳州立理工大学（LSPU）成立于1952年，最初是拜拜省立中学，并于2007年根据共和国法案第9402号演变为现在的大学地位。它是一所公立的非营利机构，受到高等教育委员会（CHED）和特许学院和大学认证机构（AACCUP）的认可，通过其多个校区提供一系列本科和研究生课程。",
             welcomeHistory2: "LSPU致力于优质教育、研究和社区服务，以其诚信、专业和创新的价值观为指导。其主校区位于拉古纳省圣克鲁斯，在圣巴勃罗市、洛斯巴尼奥斯和锡尼洛安设有常规分校区，并在马格达莱纳、纳格卡兰、利利乌和洛пес设有卫星校区。",
@@ -344,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte con tus amigos!",
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nuestra universidad. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
             aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
-            aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representaciones 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
+            aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
             aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fuente y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
             aboutDevsTitle: "Desarrolladores", aboutDevsIntro: "Este proyecto fue conceptualizado y desarrollado por los siguientes estudiantes investigadores:",
             welcomeHistory1: "La Universidad Politécnica Estatal de Laguna (LSPU), establecida en 1952, comenzó como la Escuela Secundaria Provincial de Baybay y evolucionó a su estado universitario actual bajo la Ley de la República No. 9402 en 2007. Es una institución pública, sin fines de lucro, reconocida por la Comisión de Educación Superior (CHED) y la Agencia de Acreditación de Colegios y Universidades Estatales (AACCUP), que ofrece una gama de programas de pregrado y posgrado a través de sus múltiples campus.",
@@ -819,9 +821,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function onWindowResize() {
         if (!threeRenderer || !threeCamera) return;
-        threeCamera.aspect = characterCanvasContainer.clientWidth / characterCanvasContainer.clientHeight;
+        const targetElement = characterSelectionPage.classList.contains('fullscreen-active') ? characterSelectionPage : characterCanvasContainer;
+        threeCamera.aspect = targetElement.clientWidth / targetElement.clientHeight;
         threeCamera.updateProjectionMatrix();
-        threeRenderer.setSize(characterCanvasContainer.clientWidth, characterCanvasContainer.clientHeight);
+        threeRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
     }
 
     function animateCharacterScene() {
@@ -852,25 +855,31 @@ document.addEventListener('DOMContentLoaded', function () {
             if (selectCharBtn) selectCharBtn.classList.remove('active');
             if (prevCharBtn) prevCharBtn.style.display = 'none';
             if (nextCharBtn) nextCharBtn.style.display = 'none';
-            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'none'; // Hide anim button in map view
+            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'none'; 
         } else {
             if (loadMapBtn) loadMapBtn.classList.remove('active');
             if (selectCharBtn) selectCharBtn.classList.add('active');
             if (prevCharBtn) prevCharBtn.style.display = 'flex';
             if (nextCharBtn) nextCharBtn.style.display = 'flex';
-            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'block'; // Show anim button in char view
+            if (charToggleAnimationBtn) charToggleAnimationBtn.style.display = 'block';
         }
     }
 
     function switchToCharacterView() {
         isMapView = false;
         clearScene();
-
-        if (characterSelectionPage) {
-            characterSelectionPage.classList.remove('map-view-active');
+        
+        if (characterSelectionPage.classList.contains('fullscreen-active')) {
+            characterSelectionPage.classList.remove('fullscreen-active');
+            const icon = charFullscreenBtn.querySelector('i');
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
         }
 
-        if (loadMapIcon) loadMapIcon.className = 'fas fa-map';
+        // FIX: Check if loadMapIcon exists before using it
+        if (loadMapIcon) {
+            loadMapIcon.className = 'fas fa-map';
+        }
 
         threeControls.enablePan = true;
         threeControls.minDistance = 2;
@@ -879,7 +888,10 @@ document.addEventListener('DOMContentLoaded', function () {
         threeCamera.position.set(0, 1, 3.5);
 
         updateSideMenuState();
-        loadCharacter(currentCharacterIndex);
+        // FIX: Delay loading to ensure canvas is ready and model is centered
+        setTimeout(() => {
+            loadCharacter(currentCharacterIndex);
+        }, 100);
     }
 
     function switchToMapView() {
@@ -887,11 +899,17 @@ document.addEventListener('DOMContentLoaded', function () {
         isMapView = true;
         clearScene();
 
-        if (characterSelectionPage) {
-            characterSelectionPage.classList.add('map-view-active');
+        if (characterSelectionPage.classList.contains('fullscreen-active')) {
+            characterSelectionPage.classList.remove('fullscreen-active');
+            const icon = charFullscreenBtn.querySelector('i');
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
         }
 
-        if (loadMapIcon) loadMapIcon.className = 'fas fa-map-location-dot';
+        // FIX: Check if loadMapIcon exists before using it
+        if (loadMapIcon) {
+            loadMapIcon.className = 'fas fa-map-location-dot';
+        }
 
         updateSideMenuState();
 
@@ -907,21 +925,23 @@ document.addEventListener('DOMContentLoaded', function () {
             threeScene.add(currentModel);
 
             const targetOffset = new THREE.Vector3(size.x * 0.15, 0, 0);
-
-            threeControls.target.copy(targetOffset);
-            threeControls.enablePan = true;
-            threeControls.minDistance = 10;
-            threeControls.maxDistance = 200;
-
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = threeCamera.fov * (Math.PI / 180);
             const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-            threeCamera.position.set(
+            defaultMapState.target = targetOffset;
+            defaultMapState.position = new THREE.Vector3(
                 targetOffset.x,
                 size.y * 1.1,
                 targetOffset.z + cameraZ * 1.25
             );
+            defaultMapState.minDistance = 10;
+            defaultMapState.maxDistance = 200;
+
+            threeControls.target.copy(defaultMapState.target);
+            threeControls.minDistance = defaultMapState.minDistance;
+            threeControls.maxDistance = defaultMapState.maxDistance;
+            threeCamera.position.copy(defaultMapState.position);
 
             threeControls.update();
 
@@ -936,10 +956,9 @@ document.addEventListener('DOMContentLoaded', function () {
         loader.load(characterModels[index], (gltf) => {
             currentModel = gltf.scene;
             
-            // Set up animations
             if (gltf.animations && gltf.animations.length) {
                 threeMixer = new THREE.AnimationMixer(currentModel);
-                animationAction = threeMixer.clipAction(gltf.animations[0]); // Assuming first animation is walk
+                animationAction = threeMixer.clipAction(gltf.animations[0]);
                 if (isAnimationPlaying) {
                     animationAction.play();
                 }
@@ -948,6 +967,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const box = new THREE.Box3().setFromObject(currentModel);
             const center = box.getCenter(new THREE.Vector3());
             currentModel.position.sub(center);
+
+            // FIX: Special position adjustment for the teacher model (index 2)
+            if (index === 2) { 
+                currentModel.position.y += 0.8; // Move it up to be visually centered
+            }
 
             const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
             currentModel.scale.set(scale, scale, scale);
@@ -971,6 +995,69 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    // START: Draggable Tool Menu Logic
+    if (toolMenuContainer) {
+        let isDragging = false;
+        let wasClicked = false;
+        let offsetX, offsetY;
+
+        const move = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            toolMenuContainer.style.left = `${clientX - offsetX}px`;
+            toolMenuContainer.style.top = `${clientY - offsetY}px`;
+        };
+
+        const stopDrag = () => {
+            if (isDragging) {
+                isDragging = false;
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+                setTimeout(() => wasClicked = false, 10);
+            }
+        };
+
+        toolMenuToggleBtn.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            wasClicked = true;
+            offsetX = e.clientX - toolMenuContainer.offsetLeft;
+            offsetY = e.clientY - toolMenuContainer.offsetTop;
+
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', stopDrag);
+        });
+        
+        toolMenuToggleBtn.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            wasClicked = true;
+            offsetX = e.touches[0].clientX - toolMenuContainer.offsetLeft;
+            offsetY = e.touches[0].clientY - toolMenuContainer.offsetTop;
+
+            document.addEventListener('touchmove', move);
+            document.addEventListener('touchend', stopDrag);
+        });
+
+        toolMenuToggleBtn.addEventListener('click', (e) => {
+            if (wasClicked && isDragging) {
+                e.preventDefault();
+                e.stopPropagation();
+            } else {
+                e.stopPropagation();
+                toolMenuContainer.classList.toggle('tools-visible');
+            }
+        });
+        
+        document.addEventListener('click', () => {
+             toolMenuContainer.classList.remove('tools-visible');
+        });
+    }
+    // END: Draggable Tool Menu Logic
     
     if (charToggleAnimationBtn) {
         charToggleAnimationBtn.addEventListener('click', () => {
@@ -1004,9 +1091,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (charBackToMenuBtn) {
         charBackToMenuBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (characterSelectionPage) {
-                characterSelectionPage.classList.remove('map-view-active');
-            }
+            characterSelectionPage.classList.remove('fullscreen-active');
             showPage(menuPage);
         });
     }
@@ -1032,25 +1117,38 @@ document.addEventListener('DOMContentLoaded', function () {
     if (charFullscreenBtn) {
         charFullscreenBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (!document.fullscreenElement) {
-                characterSelectionPage.requestFullscreen();
+            const icon = charFullscreenBtn.querySelector('i');
+            characterSelectionPage.classList.toggle('fullscreen-active');
+            const isFullscreen = characterSelectionPage.classList.contains('fullscreen-active');
+
+            if (isFullscreen) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+                if (isMapView) {
+                    threeControls.minDistance = 5;
+                    threeCamera.position.y = defaultMapState.position.y * 0.7; 
+                } else {
+                    threeControls.minDistance = 1.5;
+                    threeCamera.position.set(0, 1, 2.5);
+                }
             } else {
-                document.exitFullscreen();
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+                if (isMapView) {
+                    threeControls.minDistance = defaultMapState.minDistance;
+                    threeControls.target.copy(defaultMapState.target);
+                    threeCamera.position.copy(defaultMapState.position);
+                } else {
+                    threeControls.minDistance = 2;
+                    threeControls.target.set(0, 0.8, 0);
+                    threeCamera.position.set(0, 1, 3.5);
+                }
             }
+            threeControls.update();
+            
+            setTimeout(onWindowResize, 350);
         });
     }
-    
-    document.addEventListener('fullscreenchange', () => {
-        const icon = charFullscreenBtn.querySelector('i');
-        if (document.fullscreenElement) {
-            icon.classList.remove('fa-expand');
-            icon.classList.add('fa-compress');
-        } else {
-            icon.classList.remove('fa-compress');
-            icon.classList.add('fa-expand');
-        }
-        setTimeout(onWindowResize, 100);
-    });
 
     if (backFrom3DCampusBtn) {
         backFrom3DCampusBtn.addEventListener('click', (e) => {
@@ -1058,11 +1156,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showPage(menuPage);
         });
     }
-
-    const handlePlaceholderClick = (e) => { e.preventDefault(); const lang = localStorage.getItem('language') || 'en'; window.showMessage('info', window.translations[lang].popupNoticeTitle, window.translations[lang].popupFeatureComingSoon, window.translations[lang].popupOkButton); };
-    const placeholderButtons = [charPlaceholder2];
-    placeholderButtons.forEach(button => { if (button) { button.addEventListener('click', handlePlaceholderClick); } });
-
+    
     // --- END: CHARACTER SELECTION LOGIC ---
 
     function initializeApp() {

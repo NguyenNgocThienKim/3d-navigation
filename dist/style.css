@@ -1324,6 +1324,7 @@ body.dark-mode-active .message-popup {
     background-image: linear-gradient(45deg, #a1c4fd, #c2e9fb);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: all 0.3s ease-in-out;
 }
 
 #character-canvas-container {
@@ -1332,6 +1333,7 @@ body.dark-mode-active .message-popup {
     background-color: #ffffff;
     border-radius: 15px;
     cursor: grab;
+    transition: all 0.3s ease-in-out;
 }
 #character-canvas-container:active {
     cursor: grabbing;
@@ -1347,6 +1349,7 @@ body.dark-mode-active .message-popup {
     transform: translateX(-50%);
     display: flex;
     gap: 100px;
+    z-index: 2010; /* Make sure it's above the fullscreen canvas */
 }
 
 .char-nav-arrow {
@@ -1372,27 +1375,70 @@ body.dark-mode-active .message-popup {
     transform: scale(1);
 }
 
-.character-side-menu {
+/* START: New Tool Menu Styles */
+.character-side-menu-container {
     position: absolute;
     right: 3vw;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    background-color: rgba(0,0,0,0.1);
-    padding: 15px;
-    border-radius: 30px;
-    backdrop-filter: blur(5px);
+    z-index: 2010;
+    touch-action: none; /* Important for dragging */
 }
-.character-side-menu button {
-    width: 50px;
-    height: 50px;
+
+.tool-menu-toggle-btn {
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,0.5);
     background-color: rgba(0,0,0,0.2);
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    cursor: grab;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tool-menu-toggle-btn:active {
+    cursor: grabbing;
+}
+.tool-menu-toggle-btn:hover {
+    background-color: rgba(0,0,0,0.4);
+    transform: scale(1.1);
+}
+
+.character-side-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 25px;
+    backdrop-filter: blur(5px);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.character-side-menu-container:hover .character-side-menu,
+.character-side-menu-container.tools-visible .character-side-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.character-side-menu button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -1405,6 +1451,37 @@ body.dark-mode-active .message-popup {
     border-color: #ffffff;
     background-color: rgba(0, 0, 0, 0.4);
 }
+/* END: New Tool Menu Styles */
+
+
+/* START: New Pseudo-Fullscreen Styles */
+#character-selection-page.fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2005; /* High z-index to cover other content */
+    background-color: #fff; /* White background for the whole page */
+}
+
+#character-selection-page.fullscreen-active .character-canvas-wrapper {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    background-image: none;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#character-selection-page.fullscreen-active #character-canvas-container {
+    border-radius: 0;
+    background-color: transparent;
+}
+/* END: New Pseudo-Fullscreen Styles */
 
 
 @media (max-width: 768px) {
@@ -1415,13 +1492,13 @@ body.dark-mode-active .message-popup {
     .character-controls-bottom {
         bottom: 10vh;
     }
-    .character-side-menu {
+    .character-side-menu-container {
         right: 2vw;
     }
     .character-side-menu button {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
     }
     .char-nav-arrow {
         font-size: 2.5rem; /* Slightly smaller on tablets */
