@@ -977,19 +977,25 @@ body.dark-mode-active .message-popup {
 }
 
 /* START: UPDATED PIN STYLES */
-.pin {
+.pin-wrapper {
   position: absolute;
-  width: 48px;  /* Set a fixed size for the pin animation */
-  height: 48px; /* Set a fixed size for the pin animation */
-  /* Centering the pin on its location point */
-  margin-left: -24px; /* Half of the width */
-  margin-top: -48px;  /* Full height to place the tip on the point */
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -48px;
   z-index: 10;
   animation: dropIn 0.6s ease-out forwards;
   opacity: 0;
   transform-origin: bottom center;
-  cursor: pointer; /* Make pins look clickable */
+  cursor: pointer;
 }
+
+.pin-lottie {
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Crucial change: Make the lottie player non-interactive */
+}
+
 
 @keyframes dropIn {
   0% {

@@ -161,6 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!animationRequestId) {
                 animateCharacterScene(); // Resume animation loop if it was stopped
             }
+            // FIX: Force a resize check when the page is shown to handle viewport changes.
+            // Use a timeout to allow the browser to apply CSS and finalize the layout first.
+            setTimeout(onWindowResize, 50);
         }
     }
 
@@ -233,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeVisitor: "Maligayang pagdating sa Laguna State Polytechnic University – San Pablo City Campus! Huwag mag-atubiling mag-explore at kilalanin ang aming unibersidad. Kung ikaw ay narito para sa isang kaganapan, pulong, o isang mabilis na paglilibot, narito ang aming 3D map para gabayan ka sa bawat hakbang!",
             aboutIntro: "Maligayang pagdating sa 3D Navigation System ng Unibersidad – LSPU, Lungsod ng San Pablo. Isang paunang digital na inisyatiba na idinisenyo upang mapabuti ang paraan ng pagtuklas at pakikipag-ugnayan ng mga mag-aaral, guro, at bisita sa kapaligiran ng unibersidad.",
             aboutObjectivesTitle: "Mga Layunin ng Proyekto", aboutObjectivesText: "Nilalayon ng proyektong ito na gawing simple ang nabigasyon sa kampus sa pamamagitan ng pagtulong sa mga gumagamit na mahanap nang mahusay ang mga gusaling pang-akademiko, opisina, at departamento sa buong unibersidad. Nilalayon din nitong paganahin ang mga virtual na paglilibot sa kampus, na nagpapahintulot sa mga prospective na mag-aaral, magulang, at mga remote user na digital na tuklasin ang mga bakuran ng paaralan. Isa pang pangunahing layunin ay ipakita ang mga pasilidad ng unibersidad sa pamamagitan ng pag-highlight sa mga pangunahing imprastraktura at kagamitan sa pamamagitan ng mga nakaka-engganyong 3D na representasyon. Panghuli, ang proyekto ay nag-aambag sa institutional na layunin ng digital transformation sa pamamagitan ng pagsasama ng modernong teknolohiya sa parehong mga serbisyong administratibo at pang-edukasyon.",
-            aboutFeaturesTitle: "Mga Pangunahing Tampok", aboutFeaturesText: "Kasama sa 3D campus navigation system ang isang interactive na 3D na mapa na may mga kakayahan sa paghahanap ng landas upang matulungan ang mga gumagamit na mag-navigate nang mahusay. Ang isang secure na sistema ng pag-login ay nagbibigay-daan sa pag-access para sa parehong mga mag-aaral at bisita, habang ang isang nako-customize na interface ay sumusuporta sa mga opsyon sa tema, font, at dark/light mode upang mapahusay ang karanasan ng gumagamit. Nag-aalok din ang platform ng suporta sa maraming wika, kasalukuyang magagamit sa Ingles, Filipino, Korean, Japanese, Vietnamese, Chinese, Spanish, at Portuguese. Dinisenyo na may tumutugong layout, ang sistema ay ganap na gumagana sa parehong desktop at mobile device. Kasama sa mga kardagdagang tampok ang isang feedback system para sa pagkolekta ng input ng gumagamit at mga dynamic na panel ng impormasyon na nagpapakita ng detalyadong mga insight tungkol sa mga partikular na silid at gusali.",
+            aboutFeaturesTitle: "Mga Pangunahing Tampok", aboutFeaturesText: "Kasama sa 3D campus navigation system ang isang interactive na 3D na mapa na may mga kakayahan sa paghahanap ng landas upang matulungan ang mga gumagamit na mag-navigate nang mahusay. Ang isang secure na sistema ng pag-login ay nagbibigay-daan sa pag-access para sa parehong mga mag-aaral at bisita, habang ang isang nako-customize na interface ay sumusuporta sa mga opsyon sa tema, font, at dark/light mode upang mapahusay ang karanasan ng gumagamit. Nag-aalok din ang platform ng suporta sa maraming wika, kasalukuyang magagamit sa Ingles, Filipino, Korean, Japanese, Vietnamese, Chinese, Spanish, at Portuguese. Dinisenyo na may tumutugong layout, ang sistema ay ganap na gumagana sa parehong desktop at mobile device. Kasama sa mga karagdagang tampok ang isang feedback system para sa pagkolekta ng input ng gumagamit at mga dynamic na panel ng impormasyon na nagpapakita ng detalyadong mga insight tungkol sa mga partikular na silid at gusali.",
             aboutDevsTitle: "Mga Developer", aboutDevsIntro: "Ang proyektong ito ay binuo at nilikha ng mga sumusunod na mag-aaral na mananaliksik:",
             welcomeHistory1: "Ang Laguna State Polytechnic University (LSPU), na itinatag noong 1952, ay nagsimula bilang Baybay Provincial High School at naging unibersidad sa ilalim ng Republic Act No. 9402 noong 2007. Ito ay isang pampubliko, non-profit na institusyon na kinikilala ng Commission on Higher Education (CHED) at ng Accrediting Agency of Chartered Colleges and Universities (AACCUP), na nag-aalok ng iba't ibang programa sa undergraduate at graduate sa pamamagitan ng maraming kampus nito.",
             welcomeHistory2: "Ang LSPU ay nakatuon sa dekalidad na edukasyon, pananaliksik, at serbisyo sa komunidad, na ginagabayan ng mga halaga nito ng integridad, propesyonalismo, at inobasyon. Ang pangunahing kampus nito ay matatagpuan sa Santa Cruz, Laguna, na may mga regular na branch campus sa Lungsod ng San Pablo, Los Baños, at Siniloan, kasama ang mga satellite campus sa Magdalena, Nagcarlan, Liliw, at Lopez.",
@@ -347,11 +350,11 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nuestra universidad. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
             aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
             aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
-            aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fuente y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
+            aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fonte y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
             aboutDevsTitle: "Desarrolladores", aboutDevsIntro: "Este proyecto fue conceptualizado y desarrollado por los siguientes estudiantes investigadores:",
             welcomeHistory1: "La Universidad Politécnica Estatal de Laguna (LSPU), establecida en 1952, comenzó como la Escuela Secundaria Provincial de Baybay y evolucionó a su estado universitario actual bajo la Ley de la República No. 9402 en 2007. Es una institución pública, sin fines de lucro, reconocida por la Comisión de Educación Superior (CHED) y la Agencia de Acreditación de Colegios y Universidades Estatales (AACCUP), que ofrece una gama de programas de pregrado y posgrado a través de sus múltiples campus.",
             welcomeHistory2: "LSPU se dedica a la educación de calidad, la investigación y el servicio comunitario, guiada por sus valores de integridad, profesionalismo e innovación. Su campus principal se encuentra en Santa Cruz, Laguna, con campus filiales regulares en la ciudad de San Pablo, Los Baños y Siniloan, además de campus satélite en Magdalena, Nagcarlan, Liliw y Lopez.",
-            welcomeHistory3: "Como centro de innovación tecnológica, LSPU promueve el aprendizaje interdisciplinario y el desarrollo sostenible a través de sólidas alianzas dentro de la región. La universidad atiende a aproximadamente 35,000 estudiantes de pregrado y 2,000 de posgrado, con unos 300–400 miembros del profesorado.",
+            welcomeHistory3: "Como centro de innovación tecnológica, LSPU promueve el aprendizaje interdisciplinar y el desarrollo sostenible a través de sólidas alianzas dentro de la región. La universidad atiende a aproximadamente 35,000 estudiantes de pregrado y 2,000 de posgrado, con unos 300–400 miembros del profesorado.",
             welcomePopupMVTitle: "Misión y Visión", welcomePopupMissionTitle: "MISIÓN", welcomePopupMissionText: "LSPU, impulsada por un liderazgo progresista, es una institución de primer nivel que proporciona agricultura, pesca y otras disciplinas relacionadas y emergentes mediadas por la tecnología, contribuyendo significativamente al crecimiento y desarrollo de la región y la nación.", welcomePopupVisionTitle: "VISIÓN", welcomePopupVisionText: "LSPU es un centro de innovación tecnológica que promove o aprendizaje interdisciplinario, la utilización sostenible de los recursos, y la colaboración y asociación con la comunidad y las partes interesadas."
         }
     };
@@ -723,25 +726,14 @@ document.addEventListener('DOMContentLoaded', function () {
     pinData.forEach(data => {
         const pinElement = document.getElementById(`pin-${data.id}`);
         if (pinElement) {
-            let isPinDragging = false;
-            let pinPressStartTime = 0;
-            
-            pinElement.addEventListener('pointerdown', (e) => {
-                e.stopPropagation(); // Prevent map from panning
-                isPinDragging = false;
-                pinPressStartTime = Date.now();
-            });
-
-            pinElement.addEventListener('pointermove', (e) => {
-                isPinDragging = true;
-            });
-
-            pinElement.addEventListener('pointerup', (e) => {
+            // Use a 'click' event for robust tap detection on all devices.
+            // The browser will handle differentiating between a tap and a drag.
+            pinElement.addEventListener('click', (e) => {
+                // Stop the click from propagating to the map container, which would cause a pan.
                 e.stopPropagation();
-                const pressDuration = Date.now() - pinPressStartTime;
-                if (!isPinDragging && pressDuration < 250) { // It's a tap!
-                    showPinInfoPopup(data);
-                }
+                
+                // Show the info popup for the clicked pin.
+                showPinInfoPopup(data);
             });
         }
     });
@@ -822,9 +814,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function onWindowResize() {
         if (!threeRenderer || !threeCamera) return;
         const targetElement = characterSelectionPage.classList.contains('fullscreen-active') ? characterSelectionPage : characterCanvasContainer;
-        threeCamera.aspect = targetElement.clientWidth / targetElement.clientHeight;
-        threeCamera.updateProjectionMatrix();
-        threeRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
+        
+        // Ensure the target element has valid dimensions before resizing
+        if (targetElement.clientWidth > 0 && targetElement.clientHeight > 0) {
+            threeCamera.aspect = targetElement.clientWidth / targetElement.clientHeight;
+            threeCamera.updateProjectionMatrix();
+            threeRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
+        }
     }
 
     function animateCharacterScene() {
@@ -876,9 +872,8 @@ document.addEventListener('DOMContentLoaded', function () {
             icon.classList.add('fa-expand');
         }
 
-        // FIX: Check if loadMapIcon exists before using it
         if (loadMapIcon) {
-            loadMapIcon.className = 'fas fa-map';
+            loadMapIcon.className = 'fas fa-user';
         }
 
         threeControls.enablePan = true;
@@ -888,7 +883,7 @@ document.addEventListener('DOMContentLoaded', function () {
         threeCamera.position.set(0, 1, 3.5);
 
         updateSideMenuState();
-        // FIX: Delay loading to ensure canvas is ready and model is centered
+        
         setTimeout(() => {
             loadCharacter(currentCharacterIndex);
         }, 100);
@@ -906,7 +901,6 @@ document.addEventListener('DOMContentLoaded', function () {
             icon.classList.add('fa-expand');
         }
 
-        // FIX: Check if loadMapIcon exists before using it
         if (loadMapIcon) {
             loadMapIcon.className = 'fas fa-map-location-dot';
         }
@@ -968,9 +962,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const center = box.getCenter(new THREE.Vector3());
             currentModel.position.sub(center);
 
-            // FIX: Special position adjustment for the teacher model (index 2)
             if (index === 2) { 
-                currentModel.position.y += 0.8; // Move it up to be visually centered
+                currentModel.position.y += 0.8; 
             }
 
             const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
@@ -996,7 +989,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // START: Draggable Tool Menu Logic
     if (toolMenuContainer) {
         let isDragging = false;
         let wasClicked = false;
@@ -1057,7 +1049,6 @@ document.addEventListener('DOMContentLoaded', function () {
              toolMenuContainer.classList.remove('tools-visible');
         });
     }
-    // END: Draggable Tool Menu Logic
     
     if (charToggleAnimationBtn) {
         charToggleAnimationBtn.addEventListener('click', () => {
