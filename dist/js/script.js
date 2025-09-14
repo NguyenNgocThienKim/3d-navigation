@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeTitle: "Bem-vindo", welcomeText: "Pressione continuar para iniciar o tour.", enterButton: "Continuar",
             loadingTextStudent: "Inscrevendo você no campus virtual...", loadingTextVisitor: "Preparando seu tour...",
             loadingWelcomeStudent: "Bem-vindo, Estudante, ao Campus da LSPU na Cidade de San Pablo! Esperamos que você goste de conhecer sua universidade! Se estiver perdido, nós te ajudamos! Dê uma volta pelo campus, veja qual é o melhor lugar para relaxar com seus amigos!",
-            loadingWelcomeVisitor: "Bem-vindo à Universidade Politécnica Estadual de Laguna – Campus da Cidade de San Pablo! Sinta-se à vontade para explorar e conhecer nosso campus universitário. Esteja você aqui para um evento, uma reunião ou apenas um tour rápido, nosso mapa 3D está aqui para guiá-lo em cada passo do caminho!",
+            loadingWelcomeVisitor: "Bem-vindo à Universidade Politécnica Estadual de Laguna – Campus da Cidade de San Pablo! Sinta-se à vontade para explorar e conhecer nosso campus universitário. Esteja você aqui para um evento, uma reunião или apenas um tour rápido, nosso mapa 3D está aqui para guiá-lo em cada passo do caminho!",
             aboutIntro: "Bem-vindo ao Sistema de Navegação 3D da Universidade – LSPU, Cidade de San Pablo. Uma iniciativa digital pioneira projetada para aprimorar a forma como estudantes, professores e visitantes exploram e interagem com o ambiente universitário.",
             aboutObjectivesTitle: "Objetivos do Projeto", aboutObjectivesText: "Este projeto visa simplificar a navegação no campus, auxiliando os usuários a localizar eficientemente edifícios acadêmicos, escritórios e departamentos em toda a universidade. Também busca possibilitar passeios virtuais pelo campus, permitindo que futuros alunos, pais e usuários remotos explorem digitalmente as dependências da escola. Outro objetivo principal é mostrar as instalações da universidade, destacando as principais infraestruturas e comodidades por meio de representações 3D imersivas. Por fim, o projeto contribui para a meta institucional de transformação digital, integrando tecnologia moderna aos serviços administrativos и educacionais.",
             aboutFeaturesTitle: "Principais Características", aboutFeaturesText: "O sistema de navegação 3D do campus inclui um mapa 3D interativo equipado com capacidades de localização de caminhos para ajudar os usuários a navegar de forma eficiente. Um sistema de login seguro permite o acesso tanto para estudantes quanto para visitantes, enquanto uma interface personalizável suporta opções de tema, fonte e modo escuro/claro para aprimorar a experiência do usuário. A plataforma também oferece suporte multilíngue, atualmente disponível em inglês, filipino, coreano, japonês, vietnamita, chinês, espanhol e português. Projetado com um layout responsivo, o sistema é totalmente funcional em dispositivos de desktop e móveis. Recursos adicionais incluem um sistema de feedback para coletar a opinião do usuário e painéis de informações dinâmicos que exibem insights detalhados sobre salas e edifícios específicos.",
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar",
             loadingTextStudent: "Inscribiéndote en el campus virtual...", loadingTextVisitor: "Preparando tu recorrido...",
             loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte con tus amigos!",
-            loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nuestra universidad. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
+            loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nossa universidade. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
             aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
             aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
             aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fonte y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
@@ -806,6 +806,8 @@ document.addEventListener('DOMContentLoaded', function () {
         threeScene.add(dirLight);
 
         threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
+        threeControls.enableDamping = true; // This will make the controls feel smoother
+        threeControls.dampingFactor = 0.05; // A good starting value for the damping effect
 
         window.addEventListener('resize', onWindowResize, false);
         isSceneInitialized = true;
@@ -873,7 +875,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (loadMapIcon) {
-            loadMapIcon.className = 'fas fa-user';
+            loadMapIcon.className = 'fas fa-map';
         }
 
         threeControls.enablePan = true;
@@ -930,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 targetOffset.z + cameraZ * 1.25
             );
             defaultMapState.minDistance = 10;
-            defaultMapState.maxDistance = 200;
+            defaultMapState.maxDistance = 500;
 
             threeControls.target.copy(defaultMapState.target);
             threeControls.minDistance = defaultMapState.minDistance;

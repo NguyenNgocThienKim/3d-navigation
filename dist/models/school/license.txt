@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Simple City
+* source:	https://sketchfab.com/3d-models/low-poly-simple-city-ec6c4c8471e244f5a8a8d4fb2c31beb7
+* author:	MHKstudio (https://sketchfab.com/mhkstudio)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Simple City" (https://sketchfab.com/3d-models/low-poly-simple-city-ec6c4c8471e244f5a8a8d4fb2c31beb7) by MHKstudio (https://sketchfab.com/mhkstudio) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
