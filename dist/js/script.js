@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -97,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- CHARACTER SELECTION & THREE.JS VARIABLES ---
     let threeScene, threeCamera, threeRenderer, threeControls, currentModel;
+    let labelRenderer; 
     let threeMixer, animationAction, threeClock;
     let isSceneInitialized = false;
     let currentCharacterIndex = 0;
@@ -108,7 +110,17 @@ document.addEventListener('DOMContentLoaded', function () {
     let isMapView = false;
     let isAnimationPlaying = true;
     let animationRequestId;
-    let defaultMapState = {}; // To store default map view camera state
+    let defaultMapState = {}; 
+    let buildingLabels = [];
+
+    // --- ADDED: Variables for teleport animation ---
+    let isTeleporting = false;
+    let teleportStartTime, teleportDuration;
+    const startCamPos = new THREE.Vector3();
+    const endCamPos = new THREE.Vector3();
+    const startTargetPos = new THREE.Vector3();
+    const endTargetPos = new THREE.Vector3();
+    // ---------------------------------------------
 
     if (backToLoginButton) {
         backToLoginButton.addEventListener('click', (e) => {
@@ -296,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutFeaturesTitle: "主な機能", aboutFeaturesText: "3Dキャンパスナビゲーションシステムには、ユーザーが効率的にナビゲートするのに役立つ経路探索機能を備えたインタラクティブな3Dマップが含まれています。安全なログインシステムにより、学生と訪問者の両方がアクセスでき、カスタマイズ可能なインターフェースは、ユーザーエクスペリエンスを向上させるためにテーマ、フォント、ダーク/ライトモードのオプションをサポートしています。このプラットフォームは多言語サポートも提供しており、現在、英語、フィリピン語、韓国語、日本語、ベトナム語、中国語、スペイン語、ポルトガル語で利用できます。レスポンシブレイアウトで設計されたこのシステムは、デスクトップデバイスとモバイルデバイスの両方で完全に機能します。追加機能には、ユーザーの入力を収集するためのフィードバックシステムや、特定の部屋や建物に関する詳細な洞察を表示する動的な情報パネルが含まれます。",
             aboutDevsTitle: "開発者", aboutDevsIntro: "このプロジェクトは、以下の学生研究者によって構想および開発されました。",
             welcomeHistory1: "1952年に設立されたラグナ州立工科大学（LSPU）は、バイバイ州立高校として始まり、2007年の共和国法第9402号に基づき現在の大学の地位に発展しました。高等教育委員会（CHED）および公認大学認定機関（AACCUP）によって認められた公立の非営利機関であり、複数のキャンパスを通じて様々な学部および大学院プログラムを提供しています。",
-            welcomeHistory2: "LSPUは、誠実さ、専門性、革新という価値観に導かれ、質の高い教育、研究、地域社会への奉仕に専念しています。メインキャンパスはラグナ州サンタクルスにあり、サンパブロ市、ロスバニョス、シニロアンに通常のブランチキャンパス、さらにマグダレナ、ナグカルラン、リリウ、ロペスにサテライトキャンパスがあります。",
+            welcomeHistory2: "LSPUは、誠実さ、専門性、革新という価値観に導かれ、質の高い教育、研究、地域社会への奉仕に専念しています。メインキャンパスはラグナ州サンタクルスにあり、サンパブロ市、ロスバニョ스、シニロアンに通常のブランチキャンパス、さらにマグダレナ、ナグカルラン、リリウ、ロペスにサテライトキャンパスがあります。",
             welcomeHistory3: "技術革新の中心として、LSPUは地域内での強力なパートナーシップを通じて学際的な学習と持続可能な開発を促進しています。大学には約35,000人の学部生と2,000人の大学院生が在籍しており、約300人から400人の教員がいます。",
             welcomePopupMVTitle: "使命とビジョン", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "LSPUは、進歩的なリーダーシップによって推進され、技術を介した農業、漁業、その他の関連および新興分野を提供する最高の機関であり、地域および国家の成長と発展に大きく貢献しています。", welcomePopupVisionTitle: "ビジョン", welcomePopupVisionText: "LSPUは、学際的な学習、資源の持続可能な利用、そして地域社会や利害関係者との協力とパートナーシップを促進する技術革新の中心です。"
         },
@@ -346,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
             characterSelected: "¡Personaje seleccionado! Ahora procederás al campus.",
             welcomeTitle: "Bienvenido", welcomeText: "Presiona continuar para comenzar el recorrido.", enterButton: "Continuar",
             loadingTextStudent: "Inscribiéndote en el campus virtual...", loadingTextVisitor: "Preparando tu recorrido...",
-            loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte con tus amigos!",
+            loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte com tus amigos!",
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nossa universidade. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
             aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
             aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
@@ -796,6 +808,13 @@ document.addEventListener('DOMContentLoaded', function () {
         threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
         threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
         characterCanvasContainer.appendChild(threeRenderer.domElement);
+        
+        // --- ADDED: Initialize CSS2DRenderer for labels ---
+        labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(characterCanvasContainer.clientWidth, characterCanvasContainer.clientHeight);
+        labelRenderer.domElement.className = 'label-renderer'; // Apply style for overlay
+        characterCanvasContainer.appendChild(labelRenderer.domElement);
+        // --------------------------------------------------
 
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2.5);
         hemiLight.position.set(0, 20, 0);
@@ -814,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function onWindowResize() {
-        if (!threeRenderer || !threeCamera) return;
+        if (!threeRenderer || !threeCamera || !labelRenderer) return; // MODIFIED: Added check for labelRenderer
         const targetElement = characterSelectionPage.classList.contains('fullscreen-active') ? characterSelectionPage : characterCanvasContainer;
         
         // Ensure the target element has valid dimensions before resizing
@@ -822,17 +841,44 @@ document.addEventListener('DOMContentLoaded', function () {
             threeCamera.aspect = targetElement.clientWidth / targetElement.clientHeight;
             threeCamera.updateProjectionMatrix();
             threeRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
+            labelRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight); // MODIFIED: Resize label renderer as well
         }
     }
 
     function animateCharacterScene() {
         animationRequestId = requestAnimationFrame(animateCharacterScene);
         const delta = threeClock.getDelta();
+
+        // --- ADDED: Teleportation animation logic ---
+        if (isTeleporting) {
+            const elapsedTime = performance.now() - teleportStartTime;
+            let progress = Math.min(elapsedTime / teleportDuration, 1);
+    
+            // Apply a smoothstep easing function for a polished motion
+            progress = progress * progress * (3 - 2 * progress);
+    
+            // Interpolate camera position and target
+            threeCamera.position.lerpVectors(startCamPos, endCamPos, progress);
+            threeControls.target.lerpVectors(startTargetPos, endTargetPos, progress);
+    
+            if (progress >= 1) {
+                isTeleporting = false;
+                threeControls.enabled = true; // Re-enable controls after animation
+            }
+        }
+        // ------------------------------------------
+
         if (threeMixer) {
             threeMixer.update(delta);
         }
-        threeControls.update();
+        
+        // Always update controls to apply changes from teleportation or user input
+        threeControls.update(); 
+        
         threeRenderer.render(threeScene, threeCamera);
+        if (labelRenderer) {
+            labelRenderer.render(threeScene, threeCamera);
+        }
     }
 
     function clearScene() {
@@ -840,6 +886,12 @@ document.addEventListener('DOMContentLoaded', function () {
             threeScene.remove(currentModel);
             currentModel = null;
         }
+        
+        buildingLabels.forEach(label => {
+            threeScene.remove(label);
+        });
+        buildingLabels = [];
+
         if (threeMixer) {
             threeMixer.uncacheRoot(threeMixer.getRoot());
             threeMixer = null;
@@ -940,9 +992,69 @@ document.addEventListener('DOMContentLoaded', function () {
             threeCamera.position.copy(defaultMapState.position);
 
             threeControls.update();
+            
+            createBuildingLabels(center);
 
         }, undefined, (error) => {
             console.error('An error happened while loading map:', error);
+        });
+    }
+
+    // --- ADDED: Teleportation function ---
+    function teleportToBuilding(targetPosition) {
+        if (isTeleporting) return; // Prevent new animation if one is in progress
+    
+        isTeleporting = true;
+        teleportStartTime = performance.now();
+        teleportDuration = 1500; // Animation duration in milliseconds (1.5 seconds)
+    
+        startCamPos.copy(threeCamera.position);
+        startTargetPos.copy(threeControls.target);
+    
+        // Define a fixed offset for a consistent close-up view angle
+        const offset = new THREE.Vector3(25, 25, 25); 
+        endCamPos.copy(targetPosition).add(offset);
+        endTargetPos.copy(targetPosition);
+    
+        threeControls.enabled = false; // Disable user controls during animation
+    }
+    
+    function createBuildingLabels(modelCenterOffset) {
+        const buildingData = [
+            { name: 'Clinic', coords: { x: 21.2094, y: -135.605, z: 22.5471 } },
+            { name: 'playground', coords: { x: -39.4306, y: -120.825, z: 13.9731 } },
+            { name: 'Shopping Mall', coords: { x: -119.672, y: -114.53, z: 39.2949 } },
+            { name: 'Cultural Center', coords: { x: -116.025, y: -36.7074, z: 37.915 } },
+            { name: 'Café & Bakery', coords: { x: 20.9388, y: -76.9975, z: 28.2226 } },
+            { name: 'Residential Block 1', coords: { x: 22.2457, y: -28.2774, z: 20.3089 } },
+            { name: 'City Hall', coords: { x: 11.7729, y: 26.0246, z: 35.2816 } },
+            { name: 'Church Building', coords: { x: -55.3891, y: 12.4804, z: 37.5492 } },
+            { name: 'Cinco Residences', coords: { x: -46.4906, y: -32.4413, z: 32.5576 } },
+            { name: 'Technology Hub', coords: { x: -115.101, y: 24.617, z: 39.4879 } }
+        ];
+
+        buildingData.forEach(building => {
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'building-label';
+            labelDiv.textContent = building.name;
+            
+            const buildingLabel = new CSS2DObject(labelDiv);
+            const blenderCoords = building.coords;
+
+            buildingLabel.position.set(
+                blenderCoords.x - modelCenterOffset.x,
+                blenderCoords.z - modelCenterOffset.y, 
+                -blenderCoords.y - modelCenterOffset.z
+            );
+            
+            // --- ADDED: Click event listener for teleportation ---
+            labelDiv.addEventListener('click', () => {
+                teleportToBuilding(buildingLabel.position);
+            });
+            // ----------------------------------------------------
+            
+            threeScene.add(buildingLabel);
+            buildingLabels.push(buildingLabel);
         });
     }
 

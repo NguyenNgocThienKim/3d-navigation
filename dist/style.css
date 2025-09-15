@@ -1322,6 +1322,7 @@ body.dark-mode-active .message-popup {
 
 /* START: Character Selection Page Styles */
 .character-canvas-wrapper {
+    position: relative; /* ADDED: Needed for positioning the label renderer */
     width: 80vw;
     height: 80vh;
     max-width: 1200px;
@@ -1340,6 +1341,7 @@ body.dark-mode-active .message-popup {
     border-radius: 15px;
     cursor: grab;
     transition: all 0.3s ease-in-out;
+    position: relative; /* ADDED: Needed for positioning the label renderer */
 }
 #character-canvas-container:active {
     cursor: grabbing;
@@ -1347,6 +1349,75 @@ body.dark-mode-active .message-popup {
 #character-canvas-container canvas {
     display: block; /* remove extra space below canvas */
 }
+
+/* --- START: MODIFIED FOR LABELS --- */
+.label-renderer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Allows clicks to go through to the canvas */
+}
+
+.building-label {
+    position: relative;
+    background-color: white;
+    color: purple;
+    padding: 5px 10px; /* MODIFIED: Reduced padding */
+    border-radius: 8px; /* MODIFIED: Slightly smaller radius */
+    border: 2px solid black;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 14px; /* MODIFIED: Reduced font size */
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Triangle Border */
+.building-label::before {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* MODIFIED: Adjusted position */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent; /* MODIFIED: Smaller size */
+    border-right: 10px solid transparent; /* MODIFIED: Smaller size */
+    border-top: 10px solid black; /* MODIFIED: Smaller size */
+    z-index: 9;
+}
+
+/* Triangle Fill */
+.building-label::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* MODIFIED: Adjusted position */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent; /* MODIFIED: Smaller size */
+    border-right: 8px solid transparent; /* MODIFIED: Smaller size */
+    border-top: 8px solid white; /* MODIFIED: Smaller size */
+    z-index: 10;
+    transition: border-top-color 0.2s ease;
+}
+
+.building-label:hover {
+    background-color: purple;
+    color: white;
+}
+
+.building-label:hover::after {
+    border-top-color: purple;
+}
+/* --- END: MODIFIED FOR LABELS --- */
+
 
 .character-controls-bottom {
     position: absolute;
