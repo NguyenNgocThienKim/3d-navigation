@@ -879,6 +879,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (labelRenderer) {
             labelRenderer.render(threeScene, threeCamera);
         }
+<<<<<<< HEAD
     }
 
     // --- START: MODIFICATION FOR CHARACTER OVERLAP FIX ---
@@ -928,6 +929,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+=======
+>>>>>>> 46a2cac69958abbf744dd332fd69a23e6586ace7
     }
 
     function clearScene() {
@@ -938,7 +941,10 @@ document.addEventListener('DOMContentLoaded', function () {
             threeScene.remove(currentModel);
             currentModel = null;
         }
+<<<<<<< HEAD
     // --- END: MODIFICATION FOR CHARACTER OVERLAP FIX ---
+=======
+>>>>>>> 46a2cac69958abbf744dd332fd69a23e6586ace7
         
         buildingLabels.forEach(label => {
             threeScene.remove(label);
