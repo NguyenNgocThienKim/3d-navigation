@@ -1609,3 +1609,135 @@ body.dark-mode-active .campus-3d-placeholder {
     background: var(--panel-bg-dark);
     border-color: var(--panel-border-dark);
 }
+
+/* START: Navigation UI Styles */
+.navigation-popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 3000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.navigation-popup {
+    background: linear-gradient(145deg, #4481eb, #04befe);
+    border-radius: 20px;
+    width: 90vw;
+    max-width: 420px;
+    padding: 25px 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    position: relative;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.navigation-popup-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: white;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.navigation-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* FIX: Styling for the new Font Awesome icon */
+.navigation-icon {
+    font-size: 2rem;
+    width: 40px;
+    text-align: center;
+}
+
+.navigation-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+.navigation-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.nav-dropdown-wrapper {
+    position: relative;
+}
+.nav-dropdown {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 2px solid #0056b3;
+    background-color: #1a237e;
+    color: white;
+    font-size: 1rem;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+.nav-dropdown-wrapper::after {
+    content: '\f078';
+    font-family: 'Font Awesome 6 Free'; /* Corrected font-family for FA6 */
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+.nav-save-btn {
+    background-color: #1e293b;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.nav-save-btn:hover {
+    background-color: #334155;
+}
+/* END: Navigation UI Styles */
+
+/* START: Navigation Starting Message Styles */
+.navigation-starting-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3001;
+    display: none;
+}
+.navigation-starting-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+    font-size: 1.1rem;
+}
+.nav-start-icon {
+    width: 24px;
+    height: 24px;
+}
+/* END: Navigation Starting Message Styles */

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { Pathfinding, PathfindingHelper } from './lib/three-pathfinding.module.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -93,34 +94,78 @@ document.addEventListener('DOMContentLoaded', function () {
     const main3DCampusPage = document.getElementById('main-3d-campus-page');
     const selectedCharDisplay = document.getElementById('selected-char-display');
     const backFrom3DCampusBtn = document.getElementById('backFrom3DCampusBtn');
+    
+    // --- Navigation UI Elements ---
+    const navigationPopupContainer = document.getElementById('navigation-popup-container');
+    const navigationPopupCloseBtn = document.getElementById('navigation-popup-close-btn');
+    const navCharacterSelect = document.getElementById('nav-character-select');
+    const navBuildingSelect = document.getElementById('nav-building-select');
+    const navSaveBtn = document.getElementById('nav-save-btn');
+    const navigationStartingContainer = document.getElementById('navigation-starting-container');
+
 
     let currentPinCollegeKey = null;
 
     // --- CHARACTER SELECTION & THREE.JS VARIABLES ---
-    let threeScene, threeCamera, threeRenderer, threeControls, currentModel;
+    let threeScene, threeCamera, threeRenderer, threeControls, currentModel, playerModel;
     let labelRenderer; 
-    let threeMixer, animationAction, threeClock;
+    let threeMixer, animationAction;
+    let threeClock = new THREE.Clock();;
     let isSceneInitialized = false;
     let currentCharacterIndex = 0;
     const characterModels = [
         'models/character/student1/girl.gltf',
-        'models/character/student2/Boy.gltf',
-        'models/character/teacher/teacher.gltf'
+        'models/character/student2/Boy.gltf'
     ];
     let isMapView = false;
-    let isAnimationPlaying = true;
     let animationRequestId;
     let defaultMapState = {}; 
     let buildingLabels = [];
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
 
-    // --- ADDED: Variables for teleport animation ---
+
+    // --- PATHFINDING VARIABLES ---
+    const pathfinding = new Pathfinding();
+    const pathfindinghelper = new PathfindingHelper();
+    const ZONE = 'level';
+    let navMesh;
+    let calculatedPath = [];
+    let justFinishedPath = false; 
+    const playerSpeed = 5;
+    
+    // Helper to convert UPBGE Coords to Three.js
+    function upbgeToThree(x, y, z) {
+        return new THREE.Vector3(x, z, -y);
+    }
+    
+    // --- COORDINATES from user request ---
+    const spawnPoint = upbgeToThree(-2.90781, -154.947, 3.60293);
+    
+    // --- MANUALLY CORRECTED Destination Points to be on sidewalks/entrances ---
+    const destinationPoints = {
+        "Clinic": upbgeToThree(26, -150, 3.60293),
+        "Playground": upbgeToThree(-5, -112, 3.60293),
+        "Shopping Mall": upbgeToThree(-88, -120, 3.60293),
+        "Cultural Center": upbgeToThree(-88, -45, 3.60293),
+        "Technology Hub": upbgeToThree(-110, -5, 3.60293),
+        "Church Building": upbgeToThree(-55, -5, 3.60293),
+        "Cinco Residences": upbgeToThree(-52, -74, 3.60293),
+        "Café & Bakery": upbgeToThree(26, -109, 3.60293),
+        "Residential Block": upbgeToThree(26, -45, 3.60293),
+        "City Hall": upbgeToThree(-10, -8, 3.60293)
+    };
+    
+
+    // --- Variables for teleport animation ---
     let isTeleporting = false;
     let teleportStartTime, teleportDuration;
     const startCamPos = new THREE.Vector3();
     const endCamPos = new THREE.Vector3();
     const startTargetPos = new THREE.Vector3();
     const endTargetPos = new THREE.Vector3();
-    // ---------------------------------------------
+    let zoomedInBuilding = null;
+    
 
     if (backToLoginButton) {
         backToLoginButton.addEventListener('click', (e) => {
@@ -141,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showPage(pageElement) {
-        // Correctly pause the animation loop when leaving the 3D page
         if (pageElement !== characterSelectionPage && animationRequestId) {
             cancelAnimationFrame(animationRequestId);
             animationRequestId = null;
@@ -155,9 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pageElement.style.display = 'flex';
         }
 
-        // Reset map transform when showing the 2D map page
         if (pageElement === map2DPage) {
-             // Use a timeout to ensure the browser has rendered the page layout
             setTimeout(() => {
                 if (mapImageEl.complete) {
                     resetMapTransform();
@@ -167,14 +209,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 0);
         }
 
-        // Correctly initialize or resume the animation when returning to the 3D page
         if (pageElement === characterSelectionPage) {
-            initCharacterScene(); // This will only run once
+            initCharacterScene();
             if (!animationRequestId) {
-                animateCharacterScene(); // Resume animation loop if it was stopped
+                animateCharacterScene();
             }
-            // FIX: Force a resize check when the page is shown to handle viewport changes.
-            // Use a timeout to allow the browser to apply CSS and finalize the layout first.
             setTimeout(onWindowResize, 50);
         }
     }
@@ -234,7 +273,8 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "Laguna State Polytechnic University (LSPU), established in 1952, began as Baybay Provincial High School and evolved into its current university status under Republic Act No. 9402 in 2007. It is a public, non-profit institution recognized by the Commission on Higher Education (CHED) and the Accrediting Agency of Chartered Colleges and Universities (AACCUP), offering a range of undergraduate and graduate programs through its multiple campuses.",
             welcomeHistory2: "LSPU is dedicated to quality education, research, and community service, guided by its values of integrity, professionalism, and innovation. Its main campus is located in Santa Cruz, Laguna, with regular branch campuses in San Pablo City, Los Baños, and Siniloan, plus satellite campuses in Magdalena, Nagcarlan, Liliw, and Lopez.",
             welcomeHistory3: "As a center of technological innovation, LSPU promotes interdisciplinary learning and sustainable development through strong partnerships within the region. The university serves approximately 35,000 undergraduate and 2,000 graduate students, with about 300–400 faculty members.",
-            welcomePopupMVTitle: "Mission & Vision", welcomePopupMissionTitle: "MISSION", welcomePopupMissionText: "LSPU, driven by progressive leadership, is a premier institution providing technology-mediated agriculture, fisheries and other related and emerging disciplines significantly contributing to the growth and development of the region and nation.", welcomePopupVisionTitle: "VISION", welcomePopupVisionText: "LSPU is a center of technological innovation that promotes interdisciplinary learning, sustainable utilization of resources, and collaboration and partnership with the community and stakeholders."
+            welcomePopupMVTitle: "Mission & Vision", welcomePopupMissionTitle: "MISSION", welcomePopupMissionText: "LSPU, driven by progressive leadership, is a premier institution providing technology-mediated agriculture, fisheries and other related and emerging disciplines significantly contributing to the growth and development of the region and nation.", welcomePopupVisionTitle: "VISION", welcomePopupVisionText: "LSPU is a center of technological innovation that promotes interdisciplinary learning, sustainable utilization of resources, and collaboration and partnership with the community and stakeholders.",
+            destinationReached: "You have reached your destination. Do you want to reset the character's position?",
         },
         fil: {
             settingsTitle: "Mga Setting", soundLabel: "Tunog", zoomLabel: "Laki", darkModeLabel: "Dark Mode", themeLabel: "Tema", fontLabel: "Font", languageLabel: "Wika", accountLabel: "Account", settingsBackToMain: "Bumalik sa Simula",
@@ -253,7 +293,8 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "Ang Laguna State Polytechnic University (LSPU), na itinatag noong 1952, ay nagsimula bilang Baybay Provincial High School at naging unibersidad sa ilalim ng Republic Act No. 9402 noong 2007. Ito ay isang pampubliko, non-profit na institusyon na kinikilala ng Commission on Higher Education (CHED) at ng Accrediting Agency of Chartered Colleges and Universities (AACCUP), na nag-aalok ng iba't ibang programa sa undergraduate at graduate sa pamamagitan ng maraming kampus nito.",
             welcomeHistory2: "Ang LSPU ay nakatuon sa dekalidad na edukasyon, pananaliksik, at serbisyo sa komunidad, na ginagabayan ng mga halaga nito ng integridad, propesyonalismo, at inobasyon. Ang pangunahing kampus nito ay matatagpuan sa Santa Cruz, Laguna, na may mga regular na branch campus sa Lungsod ng San Pablo, Los Baños, at Siniloan, kasama ang mga satellite campus sa Magdalena, Nagcarlan, Liliw, at Lopez.",
             welcomeHistory3: "Bilang sentro ng teknolohikal na inobasyon, isinusulong ng LSPU ang interdisiplinaryong pag-aaral at napapanatiling pag-unlad sa pamamagitan ng matatag na pakikipagsosyo sa loob ng rehiyon. Naglilingkod ang unibersidad sa humigit-kumulang 35,000 undergraduate at 2,000 graduate na mag-aaral, na may mga 300–400 na miyembro ng guro.",
-            welcomePopupMVTitle: "Misyon at Bisyon", welcomePopupMissionTitle: "MISYON", welcomePopupMissionText: "Ang LSPU, na pinapatakbo ng progresibong pamumuno, ay isang pangunahing institusyon na nagbibigay ng edukasyon sa agrikultura, pangingisda, at iba pang kaugnay na disiplina gamit ang teknolohiya, na malaki ang naiambag sa paglago at pag-unlad ng rehiyon at bansa.", welcomePopupVisionTitle: "BISYON", welcomePopupVisionText: "Ang LSPU ay sentro ng inobasyong teknolohikal na nagsusulong ng interdisiplinaryong pag-aaral, napapanatiling paggamit ng mga yaman, at pakikipagtulungan sa komunidad at mga stakeholder."
+            welcomePopupMVTitle: "Misyon at Bisyon", welcomePopupMissionTitle: "MISYON", welcomePopupMissionText: "Ang LSPU, na pinapatakbo ng progresibong pamumuno, ay isang pangunahing institusyon na nagbibigay ng edukasyon sa agrikultura, pangingisda, at iba pang kaugnay na disiplina gamit ang teknolohiya, na malaki ang naiambag sa paglago at pag-unlad ng rehiyon at bansa.", welcomePopupVisionTitle: "BISYON", welcomePopupVisionText: "Ang LSPU ay sentro ng inobasyong teknolohikal na nagsusulong ng interdisiplinaryong pag-aaral, napapanatiling paggamit ng mga yaman, at pakikipagtulungan sa komunidad at mga stakeholder.",
+            destinationReached: "Nakarating ka na sa iyong patutunguhan. Nais mo bang i-reset ang posisyon ng karakter?",
         },
         vi: {
             settingsTitle: "Cài đặt", soundLabel: "Âm thanh", zoomLabel: "Thu phóng", darkModeLabel: "Chế độ tối", themeLabel: "Giao diện", fontLabel: "Phông chữ", languageLabel: "Ngôn ngữ", accountLabel: "Tài khoản", settingsBackToMain: "Quay lại chính",
@@ -264,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeTitle: "Chào mừng", welcomeText: "Nhấn tiếp tục để bắt đầu chuyến tham quan.", enterButton: "Tiếp tục",
             loadingTextStudent: "Đang ghi danh bạn vào khuôn viên ảo...", loadingTextVisitor: "Đang chuẩn bị chuyến tham quan của bạn...",
             loadingWelcomeStudent: "Chào mừng Sinh viên đến với Cơ sở LSPU tại Thành phố San Pablo! Chúng tôi hy vọng bạn sẽ thích thú khi dạo quanh trường đại học của mình! Nếu bạn bị lạc, chúng tôi sẽ hỗ trợ bạn! Hãy dạo quanh khuôn viên, xem đâu là nơi tuyệt vời nhất để thư giãn cùng bạn bè!",
-            loadingWelcomeVisitor: "Chào mừng đến với Đại học Bách khoa Bang Laguna – Cơ sở Thành phố San Pablo! Hãy thoải mái khám phá và tìm hiểu về khuôn viên trường của chúng tôi. Dù bạn ở đây để tham dự một sự kiện, một cuộc họp hay chỉ là một chuyến tham quan nhanh, bản đồ 3D của chúng tôi luôn sẵn sàng hướng dẫn bạn trên mọi nẻo đường!",
+            loadingWelcomeVisitor: "Chào mừng đến với Đại học Bách khoa Bang Laguna – Cơ sở Thành phố San Pablo! Hãy thoải mái khám phá và tìm hiểu về khuôn viên trường của chúng tôi. Dù bạn ở đây để tham dự một sự kiện, một cuộc họp hay chỉ là một chuyến thamquan nhanh, bản đồ 3D của chúng tôi luôn sẵn sàng hướng dẫn bạn trên mọi nẻo đường!",
             aboutIntro: "Chào mừng đến với Hệ thống Định vị 3D của Trường Đại học – LSPU, Thành phố San Pablo. Một sáng kiến kỹ thuật số tiên phong được thiết kế để nâng cao cách sinh viên, giảng viên và khách tham quan khám phá và tương tác với môi trường đại học.",
             aboutObjectivesTitle: "Mục tiêu của Dự án", aboutObjectivesText: "Dự án này nhằm mục đích đơn giản hóa việc điều hướng trong khuôn viên trường bằng cách hỗ trợ người dùng định vị hiệu quả các tòa nhà học thuật, văn phòng và các khoa trong toàn trường. Nó cũng tìm cách cho phép các chuyến tham quan khuôn viên ảo, cho phép sinh viên tương lai, phụ huynh và người dùng từ xa khám phá khuôn viên trường bằng kỹ thuật số. Một mục tiêu quan trọng khác là giới thiệu các cơ sở vật chất của trường đại học bằng cách làm nổi bật các cơ sở hạ tầng và tiện nghi chính thông qua các hình ảnh 3D sống động. Cuối cùng, dự án góp phần vào mục tiêu chuyển đổi số của nhà trường bằng cách tích hợp công nghệ hiện đại vào cả dịch vụ hành chính và giáo dục.",
             aboutFeaturesTitle: "Các tính năng chính", aboutFeaturesText: "Hệ thống định vị 3D trong khuôn viên trường bao gồm một bản đồ 3D tương tác được trang bị khả năng tìm đường để giúp người dùng điều hướng hiệu quả. Một hệ thống đăng nhập an toàn cho phép cả sinh viên và khách truy cập, trong khi giao diện có thể tùy chỉnh hỗ trợ các tùy chọn chủ đề, phông chữ và chế độ tối/sáng để nâng cao trải nghiệm người dùng. Nền tảng này cũng cung cấp hỗ trợ đa ngôn ngữ, hiện có sẵn bằng tiếng Anh, tiếng Filipino, tiếng Hàn, tiếng Nhật, tiếng Việt, tiếng Trung, tiếng Tây Ban Nha và tiếng Bồ Đào Nha. Được thiết kế với bố cục đáp ứng, hệ thống hoạt động đầy đủ trên cả thiết bị máy tính để bàn và di động. Các tính năng bổ sung bao gồm một hệ thống phản hồi để thu thập ý kiến người dùng và các bảng thông tin động hiển thị thông tin chi tiết về các phòng và tòa nhà cụ thể.",
@@ -272,7 +313,8 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "Đại học Bách khoa Laguna State (LSPU), được thành lập năm 1952, ban đầu là Trường Trung học Phổ thông Baybay và phát triển thành trường đại học hiện tại theo Đạo luật Cộng hòa số 9402 năm 2007. Đây là một tổ chức công lập, phi lợi nhuận được Ủy ban Giáo dục Đại học (CHED) và Cơ quan Công nhận các trường Cao đẳng và Đại học được cấp phép (AACCUP) công nhận, cung cấp nhiều chương trình đại học và sau đại học thông qua nhiều cơ sở của mình.",
             welcomeHistory2: "LSPU dành riêng cho giáo dục chất lượng, nghiên cứu và dịch vụ cộng đồng, được hướng dẫn bởi các giá trị về tính chính trực, tính chuyên nghiệp và sự đổi mới. Cơ sở chính của trường tọa lạc tại Santa Cruz, Laguna, với các cơ sở chi nhánh thường xuyên tại Thành phố San Pablo, Los Baños và Siniloan, cùng với các cơ sở vệ tinh tại Magdalena, Nagcarlan, Liliw và Lopez.",
             welcomeHistory3: "Là một trung tâm đổi mới công nghệ, LSPU thúc đẩy việc học tập liên ngành và phát triển bền vững thông qua các quan hệ đối tác chặt chẽ trong khu vực. Trường đại học này phục vụ khoảng 35.000 sinh viên đại học và 2.000 sinh viên sau đại học, với khoảng 300–400 giảng viên.",
-            welcomePopupMVTitle: "Sứ mệnh & Tầm nhìn", welcomePopupMissionTitle: "SỨ MỆNH", welcomePopupMissionText: "LSPU, được dẫn dắt bởi sự lãnh đạo tiến bộ, là một cơ sở hàng đầu cung cấp các ngành nông nghiệp, thủy sản và các ngành mới nổi khác qua trung gian công nghệ, đóng góp đáng kể vào sự tăng trưởng và phát triển của khu vực và quốc gia.", welcomePopupVisionTitle: "TẦM NHÌN", welcomePopupVisionText: "LSPU là một trung tâm đổi mới công nghệ thúc đẩy học tập liên ngành, sử dụng bền vững các nguồn lực, và hợp tác và đối tác với cộng đồng và các bên liên quan."
+            welcomePopupMVTitle: "Sứ mệnh & Tầm nhìn", welcomePopupMissionTitle: "SỨ MỆNH", welcomePopupMissionText: "LSPU, được dẫn dắt bởi sự lãnh đạo tiến bộ, là một cơ sở hàng đầu cung cấp các ngành nông nghiệp, thủy sản và các ngành mới nổi khác qua trung gian công nghệ, đóng góp đáng kể vào sự tăng trưởng và phát triển của khu vực và quốc gia.", welcomePopupVisionTitle: "TẦM NHÌN", welcomePopupVisionText: "LSPU là một trung tâm đổi mới công nghệ thúc đẩy học tập liên ngành, sử dụng bền vững các nguồn lực, và hợp tác và đối tác với cộng đồng và các bên liên quan.",
+            destinationReached: "Bạn đã đến đích. Bạn có muốn đặt lại vị trí của nhân vật không?",
         },
         ko: {
             settingsTitle: "설정", soundLabel: "소리", zoomLabel: "확대", darkModeLabel: "다크 모드", themeLabel: "테마", fontLabel: "글꼴", languageLabel: "언어", accountLabel: "계정", settingsBackToMain: "메인으로 돌아가기",
@@ -291,7 +333,8 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "1952년에 설립된 라구나 주립 폴리테크닉 대학교(LSPU)는 바이바이 지방 고등학교로 시작하여 2007년 공화국법 제9402호에 따라 현재의 대학 지위로 발전했습니다. 고등교육위원회(CHED)와 공인대학인증기관(AACCUP)의 인정을 받은 공립 비영리 기관으로, 여러 캠퍼스를 통해 다양한 학부 및 대학원 프로그램을 제공합니다.",
             welcomeHistory2: "LSPU는 정직, 전문성, 혁신이라는 가치를 바탕으로 양질의 교육, 연구, 지역사회 봉사에 전념하고 있습니다. 메인 캠퍼스는 라구나 주 산타크루즈에 위치하고 있으며, 산파블로 시, 로스바뇨스, 시닐로안에 정규 분교 캠퍼스가 있고 막달레나, 나그칼란, 릴리우, 로페즈에 위성 캠퍼스가 있습니다.",
             welcomeHistory3: "기술 혁신의 중심지로서 LSPU는 지역 내 강력한 파트너십을 통해 학제 간 학습과 지속 가능한 발전을 촉진합니다. 이 대학은 약 35,000명의 학부생과 2,000명의 대학원생, 그리고 약 300-400명의 교수진을 보유하고 있습니다.",
-            welcomePopupMVTitle: "사명과 비전", welcomePopupMissionTitle: "사명", welcomePopupMissionText: "LSPU는 진보적인 리더십에 의해 운영되며, 기술 매개 농업, 어업 및 기타 관련 신흥 분야를 제공하는 최고의 기관으로서 지역 및 국가의 성장과 발전에 크게 기여합니다.", welcomePopupVisionTitle: "비전", welcomePopupVisionText: "LSPU는 학제 간 학습, 자원의 지속 가능한 활용, 그리고 커뮤니티 및 이해관계자와의 협력 및 파트너십을 촉진하는 기술 혁신의 중심지입니다。"
+            welcomePopupMVTitle: "사명과 비전", welcomePopupMissionTitle: "사명", welcomePopupMissionText: "LSPU는 진보적인 리더십에 의해 운영되며, 기술 매개 농업, 어업 및 기타 관련 신흥 분야를 제공하는 최고의 기관으로서 지역 및 국가의 성장과 발전에 크게 기여합니다.", welcomePopupVisionTitle: "비전", welcomePopupVisionText: "LSPU는 학제 간 학습, 자원의 지속 가능한 활용, 그리고 커뮤니티 및 이해관계자와의 협력 및 파트너십을 촉진하는 기술 혁신의 중심지입니다。",
+            destinationReached: "목적지에 도착했습니다. 캐릭터의 위치를 재설정하시겠습니까?",
         },
         ja: {
             settingsTitle: "設定", soundLabel: "音量", zoomLabel: "ズーム", darkModeLabel: "ダークモード", themeLabel: "テーマ", fontLabel: "フォント", languageLabel: "言語", accountLabel: "アカウント", settingsBackToMain: "メインに戻る",
@@ -306,11 +349,12 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutIntro: "大学の3Dナビゲーションシステムへようこそ – LSPU、サンパブロ市。学生、教職員、訪問者が大学の環境を探索し、対話する方法を強化するために設計された先駆적인デジタルイニシアチブです。",
             aboutObjectivesTitle: "プロジェクトの目的", aboutObjectivesText: "このプロジェクトは、ユーザーが大学全体の学術棟、オフィス、学部を効率的に見つけるのを支援することにより、キャンパスのナビゲーションを簡素化することを目的としています。また、仮想キャンパスツアーを可能にし、将来の学生、保護者、リモートユーザーが学校の敷地をデジタルで探索できるようにすることも目指しています。もう1つの重要な目的は、没入型の3D表現を通じて主要なインフラストラクチャと設備を強調表示することにより、大学の施設を紹介することです。最後に、このプロジェクトは、現代技術を管理サービスと教育サービスの両方に統合することにより、デジタル変換という機関の目標に貢献します。",
             aboutFeaturesTitle: "主な機能", aboutFeaturesText: "3Dキャンパスナビゲーションシステムには、ユーザーが効率的にナビゲートするのに役立つ経路探索機能を備えたインタラクティブな3Dマップが含まれています。安全なログインシステムにより、学生と訪問者の両方がアクセスでき、カスタマイズ可能なインターフェースは、ユーザーエクスペリエンスを向上させるためにテーマ、フォント、ダーク/ライトモードのオプションをサポートしています。このプラットフォームは多言語サポートも提供しており、現在、英語、フィリピン語、韓国語、日本語、ベトナム語、中国語、スペイン語、ポルトガル語で利用できます。レスポンシブレイアウトで設計されたこのシステムは、デスクトップデバイスとモバイルデバイスの両方で完全に機能します。追加機能には、ユーザーの入力を収集するためのフィードバックシステムや、特定の部屋や建物に関する詳細な洞察を表示する動的な情報パネルが含まれます。",
-            aboutDevsTitle: "開発者", aboutDevsIntro: "このプロジェクトは、以下の学生研究者によって構想および開発されました。",
-            welcomeHistory1: "1952年に設立されたラグナ州立工科大学（LSPU）は、バイバイ州立高校として始まり、2007年の共和国法第9402号に基づき現在の大学の地位に発展しました。高等教育委員会（CHED）および公認大学認定機関（AACCUP）によって認められた公立の非営利機関であり、複数のキャンパスを通じて様々な学部および大学院プログラムを提供しています。",
+            aboutDevsTitle: "開発者", aboutDevsIntro: "このプロジェクトは、以下の学生研究者によって構相および開発されました。",
+            welcomeHistory1: "1952年に設立されたラグナ州立工科大学（LSPU）は、バイバイ州立高校として始まり、2007年の共和国法第9402号に基づき現在の大学の地位に発展しました。高等教育위원회（CHED）および公認大学認定機関（AACCUP）によって認められた公立の非営利機関であり、複数のキャンパスを通じて様々な学部および大学院プログラムを提供しています。",
             welcomeHistory2: "LSPUは、誠実さ、専門性、革新という価値観に導かれ、質の高い教育、研究、地域社会への奉仕に専念しています。メインキャンパスはラグナ州サンタクルスにあり、サンパブロ市、ロスバニョ스、シニロアンに通常のブランチキャンパス、さらにマグダレナ、ナグカルラン、リリウ、ロペスにサテライトキャンパスがあります。",
             welcomeHistory3: "技術革新の中心として、LSPUは地域内での強力なパートナーシップを通じて学際的な学習と持続可能な開発を促進しています。大学には約35,000人の学部生と2,000人の大学院生が在籍しており、約300人から400人の教員がいます。",
-            welcomePopupMVTitle: "使命とビジョン", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "LSPUは、進歩的なリーダーシップによって推進され、技術を介した農業、漁業、その他の関連および新興分野を提供する最高の機関であり、地域および国家の成長と発展に大きく貢献しています。", welcomePopupVisionTitle: "ビジョン", welcomePopupVisionText: "LSPUは、学際的な学習、資源の持続可能な利用、そして地域社会や利害関係者との協力とパートナーシップを促進する技術革新の中心です。"
+            welcomePopupMVTitle: "使命とビジョン", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "LSPUは、進歩的なリーダーシップによって推進され、技術を介した農業、漁業、その他の関連および新興分野を提供する最高の機関であり、地域および国家の成長と発展に大きく貢献しています。", welcomePopupVisionTitle: "ビジョン", welcomePopupVisionText: "LSPUは、学際的な学習、資源の持続可能な利用、そして地域社会や利害関係者との協力とパートナーシップを促進する技術革新の中心です。",
+            destinationReached: "目的地に到着しました。キャラクターの位置をリセットしますか？",
         },
         zh: {
             settingsTitle: "设置", soundLabel: "音量", zoomLabel: "缩放", darkModeLabel: "深色模式", themeLabel: "主题", fontLabel: "字体", languageLabel: "语言", accountLabel: "账户", settingsBackToMain: "返回主页",
@@ -326,10 +370,11 @@ document.addEventListener('DOMContentLoaded', function () {
             aboutObjectivesTitle: "项目目标", aboutObjectivesText: "该项目旨在通过协助用户高效地定位整个大学的教学楼、办公室和系部来简化校园导航。它还致力于实现虚拟校园参观，允许未来的学生、家长和远程用户以数字方式探索校园。另一个关键目标是通过沉浸式3D表现形式突出主要基础设施和便利设施，展示大学设施。最后，该项目通过将现代技术整合到行政和教育服务中，为机构的数字化转型目标做出贡献。",
             aboutFeaturesTitle: "主要特点", aboutFeaturesText: "3D校园导航系统包括一个交互式3D地图，配备了寻路功能，以帮助用户高效导航。安全的登录系统允许学生和访客访问，而可定制的界面支持主题、字体和暗/亮模式选项，以增强用户体验。该平台还提供多语言支持，目前支持英语、菲律リピン语、韩语、日语、越南语、中文、西班牙语和葡萄牙语。该系统采用响应式布局设计，完全可在台式机和移动设备上运行。其他功能包括一个用于收集用户输入的反馈系统，以及显示有关特定房间和建筑物的详细见解的动态信息面板。",
             aboutDevsTitle: "开发者", aboutDevsIntro: "该项目由以下学生研究人员构思和开发：",
-            welcomeHistory1: "拉古纳州立理工大学（LSPU）成立于1952年，最初是拜拜省立中学，并于2007年根据共和国法案第9402号演变为现在的大学地位。它是一所公立的非营利机构，受到高等教育委员会（CHED）和特许学院和大学认证机构（AACCUP）的认可，通过其多个校区提供一系列本科和研究生课程。",
+            welcomeHistory1: "拉古纳州立理工大学（LSPU）成立于1952年，最初是拜拜省立中学，并于2007年根据共和国法案第9402号演变为现在的大学地位。它是一所公立的非营利机构，受到高等教育委员会（CHED）和特许学院和大学认证机构（AACCUP）的认可，通過其多个校区提供一系列本科和研究生课程。",
             welcomeHistory2: "LSPU致力于优质教育、研究和社区服务，以其诚信、专业和创新的价值观为指导。其主校区位于拉古纳省圣克鲁斯，在圣巴勃罗市、洛斯巴尼奥斯和锡尼洛安设有常规分校区，并在马格达莱纳、纳格卡兰、利利乌和洛пес设有卫星校区。",
             welcomeHistory3: "作为技术创新的中心，LSPU通过与该地区内建立强大的伙伴关系，促进跨学科学习和可持续发展。该大学为大约35,000名本科生和2,000名研究生提供服务，拥有约300-400名教职员工。",
-            welcomePopupMVTitle: "使命与愿景", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "在进步领导力的推动下，LSPU是一所一流的机构，提供技术媒介的农业、渔业及其他相关和新兴学科，为地区和国家的发展做出了重大贡献。", welcomePopupVisionTitle: "愿景", welcomePopupVisionText: "LSPU是一个技术创新中心，促进跨学科学习、资源的可持续利用，以及与社区和利益相关者的合作与伙伴关系。"
+            welcomePopupMVTitle: "使命与愿景", welcomePopupMissionTitle: "使命", welcomePopupMissionText: "在进步领导力的推动下，LSPU是一所一流的机构，提供技术媒介的农业、渔业及其他相关和新兴学科，为地区和国家的发展做出了重大贡献。", welcomePopupVisionTitle: "愿景", welcomePopupVisionText: "LSPU是一个技术创新中心，促进跨学科学习、资源的可持续利用，以及与社区和利益相关者的合作与伙伴关系。",
+            destinationReached: "您已到达目的地。要重置角色位置吗？",
         },
         pt: {
             settingsTitle: "Configurações", soundLabel: "Som", zoomLabel: "Zoom", darkModeLabel: "Modo Escuro", themeLabel: "Tema", fontLabel: "Fonte", languageLabel: "Idioma", accountLabel: "Conta", settingsBackToMain: "Voltar ao Início",
@@ -348,7 +393,8 @@ document.addEventListener('DOMContentLoaded', function () {
             welcomeHistory1: "A Universidade Politécnica Estadual de Laguna (LSPU), fundada em 1952, começou como Escola Secundária Provincial de Baybay e evoluiu para seu status universitário atual sob a Lei da República nº 9402 em 2007. É uma instituição pública, sem fins lucrativos, reconhecida pela Comissão de Educação Superior (CHED) e pela Agência de Credenciamento de Faculdades e Universidades (AACCUP), oferecendo uma variedade de programas de graduação e pós-graduação em seus múltiplos campi.",
             welcomeHistory2: "A LSPU dedica-se à education de qualidade, pesquisa e serviço comunitário, guiada por seus valores de integridade, profissionalismo e inovação. Seu campus principal está localizado em Santa Cruz, Laguna, com campi filiais regulares na cidade de San Pablo, Los Baños e Siniloan, além de campi satélites em Magdalena, Nagcarlan, Liliw e Lopez.",
             welcomeHistory3: "Como um centro de inovação tecnológica, a LSPU promove o aprendizado interdisciplinar e o desenvolvimento sustentável por meio de fortes parcerias na região. A universidade atende aproximadamente 35,000 estudantes de graduação e 2,000 de pós-graduação, com cerca de 300 a 400 membros do corpo docente.",
-            welcomePopupMVTitle: "Missão e Visão", welcomePopupMissionTitle: "MISSÃO", welcomePopupMissionText: "A LSPU, impulsionada por uma liderança progressista, é uma instituição de primeira linha que oferece agricultura mediada por tecnologia, pesca e outras disciplinas relacionadas e emergentes, contribuindo significativamente para o crescimento e desenvolvimento da região e da nação.", welcomePopupVisionTitle: "VISÃO", welcomePopupVisionText: "A LSPU é um centro de inovação tecnológica que promove o aprendizado interdisciplinar, a utilização sustentável de recursos e a colaboração e parceria com a comunidade e as partes interessadas."
+            welcomePopupMVTitle: "Missão e Visão", welcomePopupMissionTitle: "MISSÃO", welcomePopupMissionText: "A LSPU, impulsionada por uma liderança progressista, é uma instituição de primeira linha que oferece agricultura mediada por tecnologia, pesca e outras disciplinas relacionadas e emergentes, contribuindo significativamente para o crescimento e desenvolvimento da região e da nação.", welcomePopupVisionTitle: "VISÃO", welcomePopupVisionText: "A LSPU é um centro de inovação tecnológica que promove o aprendizado interdisciplinar, a utilização sustentável de recursos e a colaboração e parceria com a comunidade e as partes interessadas.",
+            destinationReached: "Você chegou ao seu destino. Deseja redefinir a posição do personagem?",
         },
         es: {
             settingsTitle: "Configuraciones", soundLabel: "Sonido", zoomLabel: "Zoom", darkModeLabel: "Modo Oscuro", themeLabel: "Tema", fontLabel: "Fuente", languageLabel: "Idioma", accountLabel: "Cuenta", settingsBackToMain: "Volver al Inicio",
@@ -361,13 +407,14 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingWelcomeStudent: "¡Bienvenido, Estudiante, al Campus de LSPU en la Ciudad de San Pablo! ¡Esperamos que disfrutes explorando tu universidad! Si te pierdes, ¡nosotros te cubrimos! ¡Recorre el campus, mira dónde está el melhor lugar para relajarte com tus amigos!",
             loadingWelcomeVisitor: "¡Bienvenido a la Universidad Politécnica Estatal de Laguna – Campus de la Ciudad de San Pablo! Siéntete libre de explorar y conocer los terrenos de nossa universidade. Ya sea que estés aquí para un evento, una reunión o simplemente un recorrido rápido, ¡nuestro mapa 3D está aquí para guiarte en cada paso del camino!",
             aboutIntro: "Bienvenido al Sistema de Navegação 3D de la Universidad – LSPU, Ciudad de San Pablo. Una iniciativa digital pionera diseñada para mejorar la forma en que los estudiantes, el personal docente y los visitantes exploran e interactúan con el entorno universitario.",
-            aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el proyecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
-            aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interactivo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fonte y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
+            aboutObjectivesTitle: "Objetivos del Proyecto", aboutObjectivesText: "Este proyecto tiene como objetivo simplificar la navegación en el campus al ayudar a los usuarios a localizar de manera eficiente edificios académicos, oficinas y departamentos en toda la universidad. También busca permitir recorridos virtuales por el campus, permitiendo a los futuros estudiantes, padres y usuarios remotos explorar digitalmente las instalaciones de la escuela. Otro objetivo clave es mostrar las instalaciones universitarias destacando la infraestructura principal y las comodidades a través de representações 3D inmersivas. Por último, el projecto contribuye al objetivo institucional de la transformación digital al integrar tecnología moderna tanto en los servicios administrativos como educativos.",
+            aboutFeaturesTitle: "Características Clave", aboutFeaturesText: "El sistema de navegación del campus en 3D incluye un mapa 3D interativo equipado com capacidades de búsqueda de rutas para ayudar a los usuarios a navegar de manera eficiente. Un sistema de inicio de sesión seguro permite el acceso tanto para estudiantes como para visitantes, mientras que una interfaz personalizable admite opciones de tema, fonte y modo oscuro/claro para mejorar la experiencia del usuario. La plataforma también ofrece soporte multilingüe, actualmente disponible en inglés, filipino, coreano, japonés, vietnamita, chino, español y português. Diseñado con un diseño receptivo, el sistema es totalmente funcional en dispositivos de escritorio y móviles. Las características adicionales incluyen un sistema de retroalimentación para recopilar las opiniones de los usuarios y paneles de información dinámicos que muestran información detallada sobre salas y edificios específicos.",
             aboutDevsTitle: "Desarrolladores", aboutDevsIntro: "Este proyecto fue conceptualizado y desarrollado por los siguientes estudiantes investigadores:",
-            welcomeHistory1: "La Universidad Politécnica Estatal de Laguna (LSPU), establecida en 1952, comenzó como la Escuela Secundaria Provincial de Baybay y evolucionó a su estado universitario actual bajo la Ley de la República No. 9402 en 2007. Es una institución pública, sin fines de lucro, reconocida por la Comisión de Educación Superior (CHED) y la Agencia de Acreditación de Colegios y Universidades Estatales (AACCUP), que ofrece una gama de programas de pregrado y posgrado a través de sus múltiples campus.",
+            welcomeHistory1: "La Universidad Politécnica Estatal de Laguna (LSPU), establecida en 1952, comenzó como la Escuela Secundaria Provincial de Baybay y evolucionó a su estado universitario actual bajo la Ley de la República No. 9402 en 2007. Es una institution pública, sin fines de lucro, reconocida por la Comisión de Educación Superior (CHED) y la Agencia de Acreditación de Colegios y Universidades Estatales (AACCUP), que ofrece una gama de programas de pregrado y posgrado a través de sus múltiples campus.",
             welcomeHistory2: "LSPU se dedica a la educación de calidad, la investigación y el servicio comunitario, guiada por sus valores de integridad, profesionalismo e innovación. Su campus principal se encuentra en Santa Cruz, Laguna, con campus filiales regulares en la ciudad de San Pablo, Los Baños y Siniloan, además de campus satélite en Magdalena, Nagcarlan, Liliw y Lopez.",
             welcomeHistory3: "Como centro de innovación tecnológica, LSPU promueve el aprendizaje interdisciplinar y el desarrollo sostenible a través de sólidas alianzas dentro de la región. La universidad atiende a aproximadamente 35,000 estudiantes de pregrado y 2,000 de posgrado, con unos 300–400 miembros del profesorado.",
-            welcomePopupMVTitle: "Misión y Visión", welcomePopupMissionTitle: "MISIÓN", welcomePopupMissionText: "LSPU, impulsada por un liderazgo progresista, es una institución de primer nivel que proporciona agricultura, pesca y otras disciplinas relacionadas y emergentes mediadas por la tecnología, contribuyendo significativamente al crecimiento y desarrollo de la región y la nación.", welcomePopupVisionTitle: "VISIÓN", welcomePopupVisionText: "LSPU es un centro de innovación tecnológica que promove o aprendizaje interdisciplinario, la utilización sostenible de los recursos, y la colaboración y asociación con la comunidad y las partes interesadas."
+            welcomePopupMVTitle: "Misión y Visión", welcomePopupMissionTitle: "MISIÓN", welcomePopupMissionText: "LSPU, impulsada por un liderazgo progresista, es una institución de primer nivel que proporciona agricultura, pesca y otras disciplinas relacionadas y emergentes mediadas por la tecnología, contribuyendo significativamente al crecimiento y desarrollo de la región y la nación.", welcomePopupVisionTitle: "VISIÓN", welcomePopupVisionText: "LSPU es un centro de innovación tecnológica que promove o aprendizaje interdisciplinario, la utilización sostenible de los recursos, y la colaboración y asociación con la comunidad y las partes interesadas.",
+            destinationReached: "¿Has llegado a tu destino. ¿Quieres restablecer la posición del personaje?",
         }
     };
 
@@ -529,7 +576,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const popup = collegeInfoPopupContainer.querySelector('.pin-info-popup');
         if (!popup || !buildingInfo[collegeKey]) return;
 
-        // Reset classes before adding the new one
         popup.className = 'pin-info-popup college-popup';
 
         const info = buildingInfo[collegeKey];
@@ -537,7 +583,6 @@ document.addEventListener('DOMContentLoaded', function () {
         collegePopupTitle.textContent = info.title;
         collegePopupDetails.innerHTML = info.details;
 
-        // Add the specific color class for the college
         if (info.colorClass) {
             popup.classList.add(info.colorClass);
         }
@@ -632,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const scaleX = wrapperWidth / contentWidth;
         const scaleY = wrapperHeight / contentHeight;
         
-        mapState.scale = Math.min(scaleX, scaleY) * 0.95; // Use 0.95 for a tighter fit
+        mapState.scale = Math.min(scaleX, scaleY) * 0.95;
         mapState.transform.x = (wrapperWidth - contentWidth * mapState.scale) / 2;
         mapState.transform.y = (wrapperHeight - contentHeight * mapState.scale) / 2;
 
@@ -682,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (isPinching && activePointers.size === 2) {
                 const pointers = [...activePointers.values()];
                 const newDist = getDistance(pointers[0], pointers[1]);
-                const sensitivity = 0.5; // Adjust this value to make zoom less sensitive
+                const sensitivity = 0.5;
                 const scaleMultiplier = 1 + ((newDist / initialPinchDistance) - 1) * sensitivity;
                 
                 const midpoint = getMidpoint(pointers[0], pointers[1]);
@@ -734,17 +779,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // --- Mobile Pin Tap Fix ---
     pinData.forEach(data => {
         const pinElement = document.getElementById(`pin-${data.id}`);
         if (pinElement) {
-            // Use a 'click' event for robust tap detection on all devices.
-            // The browser will handle differentiating between a tap and a drag.
             pinElement.addEventListener('click', (e) => {
-                // Stop the click from propagating to the map container, which would cause a pan.
                 e.stopPropagation();
-                
-                // Show the info popup for the clicked pin.
                 showPinInfoPopup(data);
             });
         }
@@ -754,32 +793,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // START: Drag-to-scroll for popups
     function enableDragToScroll(element) {
         if (!element) return;
-
         let isDown = false;
         let startY;
         let scrollTop;
-
         element.addEventListener('pointerdown', (e) => {
-            // Only activate for touch and mouse left-click
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             isDown = true;
             element.classList.add('content-wrapper-active-drag');
             startY = e.pageY - element.offsetTop;
             scrollTop = element.scrollTop;
-            element.style.scrollBehavior = 'auto'; // Disable smooth scroll during drag
+            element.style.scrollBehavior = 'auto';
         });
-
         const stopDragging = () => {
             isDown = false;
             element.classList.remove('content-wrapper-active-drag');
-            element.style.scrollBehavior = 'smooth'; // Re-enable after drag
+            element.style.scrollBehavior = 'smooth';
         };
-
         element.addEventListener('pointerleave', stopDragging);
         element.addEventListener('pointerup', stopDragging);
         element.addEventListener('pointercancel', stopDragging);
-
-
         element.addEventListener('pointermove', (e) => {
             if (!isDown) return;
             e.preventDefault();
@@ -788,60 +820,51 @@ document.addEventListener('DOMContentLoaded', function () {
             element.scrollTop = scrollTop - walk;
         });
     }
-
     enableDragToScroll(welcomePopupContentWrapper);
     enableDragToScroll(infoPopupContentWrapper);
     // END: Drag-to-scroll for popups
 
 
-    // --- START: CHARACTER SELECTION LOGIC ---
+    // --- START: CHARACTER SCENE LOGIC ---
     function initCharacterScene() {
         if (isSceneInitialized) return;
-        threeClock = new THREE.Clock();
         threeScene = new THREE.Scene();
         const aspectRatio = characterCanvasContainer.clientWidth / characterCanvasContainer.clientHeight;
         threeCamera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 1000);
-
         threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         threeRenderer.setSize(characterCanvasContainer.clientWidth, characterCanvasContainer.clientHeight);
         threeRenderer.setPixelRatio(window.devicePixelRatio);
         threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
         threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
         characterCanvasContainer.appendChild(threeRenderer.domElement);
-        
-        // --- ADDED: Initialize CSS2DRenderer for labels ---
         labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(characterCanvasContainer.clientWidth, characterCanvasContainer.clientHeight);
-        labelRenderer.domElement.className = 'label-renderer'; // Apply style for overlay
+        labelRenderer.domElement.className = 'label-renderer';
         characterCanvasContainer.appendChild(labelRenderer.domElement);
-        // --------------------------------------------------
-
+        threeScene.add(pathfindinghelper);
+        pathfindinghelper.visible = false;
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2.5);
         hemiLight.position.set(0, 20, 0);
         threeScene.add(hemiLight);
-
         const dirLight = new THREE.DirectionalLight(0xffffff, 1);
         dirLight.position.set(10, 10, 10);
         threeScene.add(dirLight);
-
         threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
-        threeControls.enableDamping = true; // This will make the controls feel smoother
-        threeControls.dampingFactor = 0.05; // A good starting value for the damping effect
-
+        threeControls.enableDamping = true;
+        threeControls.dampingFactor = 0.05;
+        threeRenderer.domElement.addEventListener('pointerdown', onPointerDown, false);
         window.addEventListener('resize', onWindowResize, false);
         isSceneInitialized = true;
     }
 
     function onWindowResize() {
-        if (!threeRenderer || !threeCamera || !labelRenderer) return; // MODIFIED: Added check for labelRenderer
+        if (!threeRenderer || !threeCamera || !labelRenderer) return;
         const targetElement = characterSelectionPage.classList.contains('fullscreen-active') ? characterSelectionPage : characterCanvasContainer;
-        
-        // Ensure the target element has valid dimensions before resizing
         if (targetElement.clientWidth > 0 && targetElement.clientHeight > 0) {
             threeCamera.aspect = targetElement.clientWidth / targetElement.clientHeight;
             threeCamera.updateProjectionMatrix();
             threeRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
-            labelRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight); // MODIFIED: Resize label renderer as well
+            labelRenderer.setSize(targetElement.clientWidth, targetElement.clientHeight);
         }
     }
 
@@ -849,102 +872,147 @@ document.addEventListener('DOMContentLoaded', function () {
         animationRequestId = requestAnimationFrame(animateCharacterScene);
         const delta = threeClock.getDelta();
 
-        // --- ADDED: Teleportation animation logic ---
         if (isTeleporting) {
             const elapsedTime = performance.now() - teleportStartTime;
             let progress = Math.min(elapsedTime / teleportDuration, 1);
-    
-            // Apply a smoothstep easing function for a polished motion
             progress = progress * progress * (3 - 2 * progress);
-    
-            // Interpolate camera position and target
             threeCamera.position.lerpVectors(startCamPos, endCamPos, progress);
             threeControls.target.lerpVectors(startTargetPos, endTargetPos, progress);
-    
             if (progress >= 1) {
                 isTeleporting = false;
-                threeControls.enabled = true; // Re-enable controls after animation
+                threeControls.enabled = true;
             }
         }
-        // ------------------------------------------
+
+        if (playerModel && navMesh) {
+            if (calculatedPath && calculatedPath.length > 0) {
+                threeControls.enabled = true; 
+
+                let targetPosition = calculatedPath[0];
+                const distanceXZ = Math.hypot(
+                    playerModel.position.x - targetPosition.x,
+                    playerModel.position.z - targetPosition.z
+                );
+
+                if (animationAction && !animationAction.isRunning()) {
+                    animationAction.play();
+                }
+
+                if (distanceXZ > 0.1) {
+                    const direction = targetPosition.clone().sub(playerModel.position);
+                    direction.y = 0;
+                    direction.normalize();
+                    playerModel.position.add(direction.multiplyScalar(playerSpeed * delta));
+                    
+                    const lookAtTarget = new THREE.Vector3(targetPosition.x, playerModel.position.y, targetPosition.z);
+                    playerModel.lookAt(lookAtTarget);
+                    
+                } else {
+                    calculatedPath.shift();
+                    if (calculatedPath.length === 0) {
+                        if (animationAction) animationAction.stop();
+                        justFinishedPath = true;
+                    }
+                }
+                
+                const cameraLookatOffset = new THREE.Vector3(0, 2.5, 0);
+                const targetLookatPos = playerModel.position.clone().add(cameraLookatOffset);
+                threeControls.target.lerp(targetLookatPos, 0.1); 
+
+            } else {
+                 threeControls.enabled = true;
+            }
+
+            const down = new THREE.Vector3(0, -1, 0);
+            const rayOrigin = new THREE.Vector3(playerModel.position.x, playerModel.position.y + 10, playerModel.position.z);
+            raycaster.set(rayOrigin, down);
+            const intersects = raycaster.intersectObject(navMesh);
+            if (intersects.length > 0) {
+                const verticalOffset = playerModel.userData.verticalOffset || 0;
+                playerModel.position.y = intersects[0].point.y + verticalOffset;
+            }
+        } else {
+             threeControls.enabled = true;
+        }
+
+
+        if (justFinishedPath) {
+            justFinishedPath = false; 
+            calculatedPath = [];
+            pathfindinghelper.visible = false;
+            
+            const finalCamOffset = new THREE.Vector3(0, 5, 10); 
+            const cameraPos = playerModel.position.clone().add(finalCamOffset);
+            const targetPos = playerModel.position.clone().add(new THREE.Vector3(0, 1.5, 0));
+            teleportCamera(cameraPos, targetPos);
+
+
+            const lang = localStorage.getItem('language') || 'en';
+            const message = (window.translations[lang] && window.translations[lang].destinationReached) || window.translations.en.destinationReached;
+
+            setTimeout(() => {
+                if (confirm(message)) {
+                    if (playerModel) {
+                        playerModel.position.copy(spawnPoint);
+                        playerModel.rotation.set(0, Math.PI, 0);
+                        pathfindinghelper.reset();
+                        teleportCamera(defaultMapState.position, defaultMapState.target);
+                    }
+                }
+            }, 500);
+        }
+
 
         if (threeMixer) {
             threeMixer.update(delta);
         }
         
-        // Always update controls to apply changes from teleportation or user input
         threeControls.update(); 
-        
         threeRenderer.render(threeScene, threeCamera);
         if (labelRenderer) {
             labelRenderer.render(threeScene, threeCamera);
         }
-<<<<<<< HEAD
     }
-
-    // --- START: MODIFICATION FOR CHARACTER OVERLAP FIX ---
-    /**
-     * Helper function to dispose of a single material and its textures.
-     * @param {THREE.Material} material - The material to dispose.
-     */
+    
     function disposeMaterial(material) {
-        // Dispose any textures the material is using
         for (const key of Object.keys(material)) {
             const value = material[key];
-            // Check if the property is a texture and has a dispose method
             if (value && typeof value === 'object' && value.isTexture) {
                 value.dispose();
             }
         }
-        // Dispose the material itself
         material.dispose();
     }
 
-    /**
-     * Traverses a model and disposes of all its geometries, materials, and textures
-     * to properly remove it from GPU memory.
-     * @param {THREE.Object3D} model - The model to dispose of.
-     */
     function disposeOfModel(model) {
         if (!model) return;
-
-        // Traverse the model's hierarchy
         model.traverse(child => {
-            // Check if the child is a mesh with disposable resources
             if (child.isMesh) {
-                // Dispose of the geometry
                 if (child.geometry) {
                     child.geometry.dispose();
                 }
-
-                // Dispose of the material(s)
                 if (child.material) {
-                    // Materials can be a single material or an array of materials
                     if (Array.isArray(child.material)) {
                         child.material.forEach(material => disposeMaterial(material));
                     } else {
-                        // It's a single material
                         disposeMaterial(child.material);
                     }
                 }
             }
         });
-=======
->>>>>>> 46a2cac69958abbf744dd332fd69a23e6586ace7
     }
 
     function clearScene() {
         if (currentModel) {
-            // Use the comprehensive disposal function to clean up the old model
             disposeOfModel(currentModel);
-            // After disposal, remove the object from the scene graph
             threeScene.remove(currentModel);
             currentModel = null;
         }
-<<<<<<< HEAD
-    // --- END: MODIFICATION FOR CHARACTER OVERLAP FIX ---
-=======
->>>>>>> 46a2cac69958abbf744dd332fd69a23e6586ace7
+        if (playerModel) {
+            disposeOfModel(playerModel);
+            threeScene.remove(playerModel);
+            playerModel = null;
+        }
         
         buildingLabels.forEach(label => {
             threeScene.remove(label);
@@ -955,6 +1023,11 @@ document.addEventListener('DOMContentLoaded', function () {
             threeMixer.uncacheRoot(threeMixer.getRoot());
             threeMixer = null;
             animationAction = null;
+        }
+        
+        if (navMesh) {
+            threeScene.remove(navMesh);
+            navMesh = null;
         }
     }
 
@@ -989,11 +1062,20 @@ document.addEventListener('DOMContentLoaded', function () {
             loadMapIcon.className = 'fas fa-map';
         }
 
+        // --- FIX: Corrected camera positioning for character view ---
         threeControls.enablePan = true;
         threeControls.minDistance = 2;
         threeControls.maxDistance = 6;
-        threeControls.target.set(0, 0.8, 0);
-        threeCamera.position.set(0, 1, 3.5);
+        threeControls.target.set(0, 0.8, 0); 
+        threeCamera.position.set(0, 1, 3.5); 
+        threeControls.update();
+
+        if (charToggleAnimationBtn) {
+            const icon = charToggleAnimationBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'fa-regular fa-square';
+            }
+        }
 
         updateSideMenuState();
         
@@ -1001,11 +1083,15 @@ document.addEventListener('DOMContentLoaded', function () {
             loadCharacter(currentCharacterIndex);
         }, 100);
     }
-
+    
     function switchToMapView() {
         if (isMapView) return;
         isMapView = true;
         clearScene();
+
+        calculatedPath = [];
+        pathfindinghelper.reset();
+        pathfindinghelper.visible = false;
 
         if (characterSelectionPage.classList.contains('fullscreen-active')) {
             characterSelectionPage.classList.remove('fullscreen-active');
@@ -1020,28 +1106,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateSideMenuState();
 
-        const loader = new GLTFLoader();
+        const manager = new THREE.LoadingManager();
+        const loader = new GLTFLoader(manager);
+
         loader.load('models/school/map.gltf', (gltf) => {
             currentModel = gltf.scene;
-
-            const box = new THREE.Box3().setFromObject(currentModel);
-            const center = box.getCenter(new THREE.Vector3());
-            const size = box.getSize(new THREE.Vector3());
-
-            currentModel.position.sub(center);
             threeScene.add(currentModel);
 
-            const targetOffset = new THREE.Vector3(size.x * 0.15, 0, 0);
+            const box = new THREE.Box3().setFromObject(currentModel);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = threeCamera.fov * (Math.PI / 180);
-            const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+            cameraZ *= 0.9; // FIX: Decreased multiplier from 1.5 to 0.9 to bring the camera closer for the default view.
 
-            defaultMapState.target = targetOffset;
-            defaultMapState.position = new THREE.Vector3(
-                targetOffset.x,
-                size.y * 1.1,
-                targetOffset.z + cameraZ * 1.25
-            );
+            defaultMapState.position = new THREE.Vector3(center.x, center.y + size.y * 0.75, center.z + cameraZ); // FIX: Slightly increased camera height for a better viewing angle.
+            defaultMapState.target = center;
             defaultMapState.minDistance = 10;
             defaultMapState.maxDistance = 500;
 
@@ -1052,44 +1134,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
             threeControls.update();
             
-            createBuildingLabels(center);
-
-        }, undefined, (error) => {
-            console.error('An error happened while loading map:', error);
+            createBuildingLabels();
         });
+
+        loader.load('models/school/Navmesh.gltf', (gltf) => {
+            let foundNavMesh = null;
+            gltf.scene.traverse((node) => {
+                if (node.isMesh) {
+                    foundNavMesh = node;
+                }
+            });
+
+            if (foundNavMesh) {
+                navMesh = foundNavMesh;
+                const zone = Pathfinding.createZone(navMesh.geometry);
+                pathfinding.setZoneData(ZONE, zone);
+                navMesh.visible = false;
+                threeScene.add(navMesh);
+            } else {
+                console.error("No mesh found in Navmesh.gltf! Pathfinding will not work.");
+            }
+        });
+
+        manager.onLoad = () => {
+            loadCharacter(currentCharacterIndex, true);
+        };
     }
 
-    // --- ADDED: Teleportation function ---
-    function teleportToBuilding(targetPosition) {
-        if (isTeleporting) return; // Prevent new animation if one is in progress
-    
+    function teleportCamera(targetPosition, targetLookat) {
         isTeleporting = true;
         teleportStartTime = performance.now();
-        teleportDuration = 1500; // Animation duration in milliseconds (1.5 seconds)
+        teleportDuration = 1000;
     
         startCamPos.copy(threeCamera.position);
         startTargetPos.copy(threeControls.target);
     
-        // Define a fixed offset for a consistent close-up view angle
-        const offset = new THREE.Vector3(25, 25, 25); 
-        endCamPos.copy(targetPosition).add(offset);
-        endTargetPos.copy(targetPosition);
+        endCamPos.copy(targetPosition);
+        endTargetPos.copy(targetLookat);
     
-        threeControls.enabled = false; // Disable user controls during animation
+        threeControls.enabled = false;
     }
     
-    function createBuildingLabels(modelCenterOffset) {
+    function resetCameraToDefaultView() {
+        if (!isMapView) return;
+        teleportCamera(defaultMapState.position, defaultMapState.target);
+        zoomedInBuilding = null;
+    }
+    
+    function createBuildingLabels() {
         const buildingData = [
-            { name: 'Clinic', coords: { x: 21.2094, y: -135.605, z: 22.5471 } },
-            { name: 'playground', coords: { x: -39.4306, y: -120.825, z: 13.9731 } },
-            { name: 'Shopping Mall', coords: { x: -119.672, y: -114.53, z: 39.2949 } },
-            { name: 'Cultural Center', coords: { x: -116.025, y: -36.7074, z: 37.915 } },
-            { name: 'Café & Bakery', coords: { x: 20.9388, y: -76.9975, z: 28.2226 } },
-            { name: 'Residential Block 1', coords: { x: 22.2457, y: -28.2774, z: 20.3089 } },
-            { name: 'City Hall', coords: { x: 11.7729, y: 26.0246, z: 35.2816 } },
-            { name: 'Church Building', coords: { x: -55.3891, y: 12.4804, z: 37.5492 } },
-            { name: 'Cinco Residences', coords: { x: -46.4906, y: -32.4413, z: 32.5576 } },
-            { name: 'Technology Hub', coords: { x: -115.101, y: 24.617, z: 39.4879 } }
+            { name: 'Clinic', coords: upbgeToThree(26, -150, 22.5471) },
+            { name: 'Playground', coords: upbgeToThree(-5, -112, 13.9731) },
+            { name: 'Shopping Mall', coords: upbgeToThree(-88, -120, 39.2949) },
+            { name: 'Cultural Center', coords: upbgeToThree(-88, -45, 37.915) },
+            { name: 'Café & Bakery', coords: upbgeToThree(26, -109, 28.2226) },
+            { name: 'Residential Block 1', coords: upbgeToThree(26, -45, 20.3089) },
+            { name: 'City Hall', coords: upbgeToThree(-10, -8, 35.2816) },
+            { name: 'Church Building', coords: upbgeToThree(-55, -5, 37.5492) },
+            { name: 'Cinco Residences', coords: upbgeToThree(-52, -74, 32.5576) },
+            { name: 'Technology Hub', coords: upbgeToThree(-110, -5, 39.4879) }
         ];
 
         buildingData.forEach(building => {
@@ -1098,57 +1201,166 @@ document.addEventListener('DOMContentLoaded', function () {
             labelDiv.textContent = building.name;
             
             const buildingLabel = new CSS2DObject(labelDiv);
-            const blenderCoords = building.coords;
-
-            buildingLabel.position.set(
-                blenderCoords.x - modelCenterOffset.x,
-                blenderCoords.z - modelCenterOffset.y, 
-                -blenderCoords.y - modelCenterOffset.z
-            );
+            buildingLabel.position.copy(building.coords);
             
-            // --- ADDED: Click event listener for teleportation ---
             labelDiv.addEventListener('click', () => {
-                teleportToBuilding(buildingLabel.position);
+                const targetPosition = buildingLabel.position.clone();
+                const offset = new THREE.Vector3(25, 25, 25);
+                const cameraTargetPosition = targetPosition.clone().add(offset);
+                
+                if (zoomedInBuilding === building.name) {
+                    resetCameraToDefaultView();
+                } else {
+                    teleportCamera(cameraTargetPosition, targetPosition);
+                    zoomedInBuilding = building.name;
+                }
             });
-            // ----------------------------------------------------
             
             threeScene.add(buildingLabel);
             buildingLabels.push(buildingLabel);
         });
     }
 
-    function loadCharacter(index) {
-        clearScene();
+    function loadCharacter(index, isOnMap = false) {
+        if (!isOnMap) {
+            clearScene();
+        }
+
         const loader = new GLTFLoader();
         loader.load(characterModels[index], (gltf) => {
-            currentModel = gltf.scene;
             
+            const characterScene = gltf.scene;
+
             if (gltf.animations && gltf.animations.length) {
-                threeMixer = new THREE.AnimationMixer(currentModel);
-                animationAction = threeMixer.clipAction(gltf.animations[0]);
-                if (isAnimationPlaying) {
-                    animationAction.play();
+                threeMixer = new THREE.AnimationMixer(characterScene);
+                const clip = THREE.AnimationClip.findByName(gltf.animations, 'walk') || THREE.AnimationClip.findByName(gltf.animations, 'Run') || gltf.animations[0];
+                if(clip){
+                     animationAction = threeMixer.clipAction(clip);
                 }
             }
+            
+            if (isOnMap) {
+                const box = new THREE.Box3().setFromObject(characterScene);
+                const size = box.getSize(new THREE.Vector3());
+                let targetHeight = 7.0;
+                const scale = targetHeight / size.y;
+                characterScene.scale.set(scale, scale, scale);
 
-            const box = new THREE.Box3().setFromObject(currentModel);
-            const center = box.getCenter(new THREE.Vector3());
-            currentModel.position.sub(center);
+                const postScaleBox = new THREE.Box3().setFromObject(characterScene);
+                const verticalOffset = -postScaleBox.min.y;
 
-            if (index === 2) { 
-                currentModel.position.y += 0.8; 
+                playerModel = characterScene;
+                playerModel.userData.verticalOffset = verticalOffset;
+                playerModel.position.copy(spawnPoint);
+                playerModel.rotation.y = Math.PI; 
+                playerModel.userData.isPlayer = true;
+
+                if (navMesh) {
+                    const down = new THREE.Vector3(0, -1, 0);
+                    const rayOrigin = new THREE.Vector3(playerModel.position.x, 20, playerModel.position.z);
+                    raycaster.set(rayOrigin, down);
+                    const intersects = raycaster.intersectObject(navMesh);
+                    if (intersects.length > 0) {
+                        playerModel.position.y = intersects[0].point.y + playerModel.userData.verticalOffset; 
+                    }
+                }
+            } else {
+                if (animationAction) {
+                    animationAction.play();
+                }
+                const box = new THREE.Box3().setFromObject(characterScene);
+                const center = box.getCenter(new THREE.Vector3());
+                characterScene.position.sub(center);
+                const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
+                characterScene.scale.set(scale, scale, scale);
+                currentModel = characterScene;
             }
-
-            const scale = 1.8 / box.getSize(new THREE.Vector3()).y;
-            currentModel.scale.set(scale, scale, scale);
-            threeScene.add(currentModel);
+            
+            threeScene.add(characterScene);
 
         }, undefined, (error) => {
             console.error(`An error happened while loading character: ${characterModels[index]}`, error);
         });
-        prevCharBtn.disabled = index === 0;
-        nextCharBtn.disabled = index === characterModels.length - 1;
+
+        if (!isOnMap) {
+             prevCharBtn.disabled = index === 0;
+             nextCharBtn.disabled = index === characterModels.length - 1;
+        }
     }
+    
+    function onPointerDown(event) {
+        if (!isMapView || !navMesh || isTeleporting) return;
+    
+        const rect = threeRenderer.domElement.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+        raycaster.setFromCamera(pointer, threeCamera);
+    
+        if (playerModel) {
+            const playerIntersect = raycaster.intersectObject(playerModel, true);
+            if (playerIntersect.length > 0) {
+                navigationPopupContainer.style.display = 'flex';
+                return;
+            }
+        }
+    }
+    
+    function calculateAndFollowPath(rawTargetPosition) {
+        if (!playerModel || !pathfinding || !navMesh) {
+            console.error("Pathfinding dependencies not ready.");
+            return;
+        }
+
+        calculatedPath = [];
+        pathfindinghelper.visible = false;
+        const playerPos = playerModel.position.clone();
+
+        const playerGroupID = pathfinding.getGroup(ZONE, playerPos, true);
+        if (playerGroupID === null) {
+            console.error("Player is not on a valid navmesh area. Cannot calculate path.");
+            pathfindinghelper.reset();
+            return;
+        }
+
+        const clampedPlayerNode = pathfinding.getClosestNode(playerPos, ZONE, playerGroupID);
+        if (!clampedPlayerNode) {
+            console.error("Could not snap player's position to the navmesh.");
+            pathfindinghelper.reset();
+            return;
+        }
+        const clampedPlayerPosition = new THREE.Vector3().copy(clampedPlayerNode.centroid);
+
+        const targetGroupID = pathfinding.getGroup(ZONE, rawTargetPosition, true);
+        if (targetGroupID === null) {
+            console.error("Target destination is not on a valid navmesh area.");
+            pathfindinghelper.reset();
+            return;
+        }
+
+        const clampedTargetNode = pathfinding.getClosestNode(rawTargetPosition, ZONE, targetGroupID);
+        if (!clampedTargetNode) {
+            console.error("Could not snap target's position to the navmesh.");
+            pathfindinghelper.reset();
+            return;
+        }
+        const clampedTargetPosition = new THREE.Vector3().copy(clampedTargetNode.centroid);
+
+        const path = pathfinding.findPath(clampedPlayerPosition, clampedTargetPosition, ZONE, playerGroupID);
+        
+        if (path && path.length > 0) {
+            calculatedPath = path;
+            
+            pathfindinghelper.setPlayerPosition(clampedPlayerPosition);
+            pathfindinghelper.setPath(calculatedPath);
+            pathfindinghelper.visible = true; 
+        } else {
+            console.warn("No path found!");
+            if(animationAction && animationAction.isRunning()) animationAction.stop();
+            pathfindinghelper.reset();
+        }
+    }
+
 
     if (hexagon3dButton) {
         hexagon3dButton.addEventListener('click', (e) => {
@@ -1172,7 +1384,6 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
             toolMenuContainer.style.left = `${clientX - offsetX}px`;
             toolMenuContainer.style.top = `${clientY - offsetY}px`;
         };
@@ -1193,7 +1404,6 @@ document.addEventListener('DOMContentLoaded', function () {
             wasClicked = true;
             offsetX = e.clientX - toolMenuContainer.offsetLeft;
             offsetY = e.clientY - toolMenuContainer.offsetTop;
-
             document.addEventListener('mousemove', move);
             document.addEventListener('mouseup', stopDrag);
         });
@@ -1203,7 +1413,6 @@ document.addEventListener('DOMContentLoaded', function () {
             wasClicked = true;
             offsetX = e.touches[0].clientX - toolMenuContainer.offsetLeft;
             offsetY = e.touches[0].clientY - toolMenuContainer.offsetTop;
-
             document.addEventListener('touchmove', move);
             document.addEventListener('touchend', stopDrag);
         });
@@ -1225,15 +1434,15 @@ document.addEventListener('DOMContentLoaded', function () {
     
     if (charToggleAnimationBtn) {
         charToggleAnimationBtn.addEventListener('click', () => {
-            isAnimationPlaying = !isAnimationPlaying;
             const icon = charToggleAnimationBtn.querySelector('i');
-
-            if (isAnimationPlaying) {
-                if (animationAction) animationAction.play();
-                icon.className = 'fa-regular fa-square-check';
-            } else {
-                if (animationAction) animationAction.stop();
-                icon.className = 'fa-regular fa-square';
+            if (animationAction) {
+                if(animationAction.isRunning()) {
+                    animationAction.stop();
+                    icon.className = 'fa-regular fa-square';
+                } else {
+                    animationAction.play();
+                    icon.className = 'fa-regular fa-square-check';
+                }
             }
         });
     }
@@ -1292,6 +1501,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     threeControls.minDistance = 5;
                     threeCamera.position.y = defaultMapState.position.y * 0.7; 
                 } else {
+                    // Corrected fullscreen character view
                     threeControls.minDistance = 1.5;
                     threeCamera.position.set(0, 1, 2.5);
                 }
@@ -1303,6 +1513,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     threeControls.target.copy(defaultMapState.target);
                     threeCamera.position.copy(defaultMapState.position);
                 } else {
+                    // Corrected non-fullscreen character view
                     threeControls.minDistance = 2;
                     threeControls.target.set(0, 0.8, 0);
                     threeCamera.position.set(0, 1, 3.5);
@@ -1321,7 +1532,58 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // --- END: CHARACTER SELECTION LOGIC ---
+    // --- START: NAVIGATION UI LOGIC ---
+    function populateBuildingDropdown() {
+        navBuildingSelect.innerHTML = '';
+        for (const buildingName in destinationPoints) {
+            const option = document.createElement('option');
+            option.value = buildingName;
+            option.textContent = buildingName.replace(/_/g, ' ');
+            navBuildingSelect.appendChild(option);
+        }
+    }
+    
+    if (navigationPopupCloseBtn) {
+        navigationPopupCloseBtn.addEventListener('click', () => {
+            navigationPopupContainer.style.display = 'none';
+        });
+    }
+    
+    if (navSaveBtn) {
+        navSaveBtn.addEventListener('click', () => {
+            navigationPopupContainer.style.display = 'none';
+            navigationStartingContainer.style.display = 'flex';
+            setTimeout(() => {
+                navigationStartingContainer.style.display = 'none';
+            }, 2500);
+            
+            const selectedCharName = navCharacterSelect.value;
+            let charIndex = 0;
+            if (selectedCharName === 'boy') charIndex = 1;
+
+            if (charIndex !== currentCharacterIndex) {
+                 currentCharacterIndex = charIndex;
+                 if (playerModel) {
+                    disposeOfModel(playerModel);
+                    threeScene.remove(playerModel);
+                    playerModel = null;
+                 }
+                 loadCharacter(currentCharacterIndex, true);
+            }
+
+            const selectedBuilding = navBuildingSelect.value;
+            const targetPosition = destinationPoints[selectedBuilding];
+            
+            if (targetPosition) {
+                 setTimeout(() => {
+                     if(playerModel) {
+                         calculateAndFollowPath(targetPosition);
+                     }
+                 }, 200);
+            }
+        });
+    }
+    // --- END: NAVIGATION UI LOGIC ---
 
     function initializeApp() {
         const savedLang = localStorage.getItem('language') || 'en';
@@ -1342,6 +1604,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const prefersDark = localStorage.getItem('darkMode') === 'enabled';
         if (darkModeCheckbox) darkModeCheckbox.checked = prefersDark;
         updateDarkMode(prefersDark);
+        
+        populateBuildingDropdown();
 
         showPage(initialPageContent);
     }

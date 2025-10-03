@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>University Navigation</title>
   
+  <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- Prevents favicon.ico 404 error -->
+  
   <link href="https://fonts.googleapis.com/css?family=Fredoka+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -412,6 +414,41 @@
         </div>
     </div>
     <!-- END: Welcome Popup -->
+	
+    <!-- START: Navigation UI -->
+    <div id="navigation-popup-container" class="navigation-popup-container">
+        <div class="navigation-popup">
+            <button id="navigation-popup-close-btn" class="navigation-popup-close-btn">&times;</button>
+            <div class="navigation-header">
+                <!-- FIX: Replaced SVG with Font Awesome icon -->
+                <i class="fa-solid fa-route navigation-icon"></i>
+                <h2 class="navigation-title">Navigation</h2>
+            </div>
+            <div class="navigation-controls">
+                <div class="nav-dropdown-wrapper">
+                    <select id="nav-character-select" class="nav-dropdown">
+                        <option value="girl">Girl</option>
+                        <option value="boy">Boy</option>
+                        
+                    </select>
+                </div>
+                <div class="nav-dropdown-wrapper">
+                     <select id="nav-building-select" class="nav-dropdown">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+            </div>
+            <button id="nav-save-btn" class="nav-save-btn">Save</button>
+        </div>
+    </div>
+    
+    <div id="navigation-starting-container" class="navigation-starting-container">
+        <div class="navigation-starting-box">
+             <svg class="nav-start-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="white"/></svg>
+            <p>Navigation is starting now......</p>
+        </div>
+    </div>
+    <!-- END: Navigation UI -->
 
     <audio id="backgroundMusic" loop src="lspu.mp3"></audio>
 
