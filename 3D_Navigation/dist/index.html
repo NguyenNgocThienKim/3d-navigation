@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Navigation</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Lato:wght@400;700&family=Open+Sans:wght@400;600&family=Merriweather:wght@400;700&family=Nunito:wght@400;600&family=Montserrat:wght@400;600&family=Source+Sans+Pro:wght@400;600&family=Oswald:wght@400;600&family=Raleway:wght@400;600&family=Ubuntu:wght@400;500&family=Caveat&family=Pacifico&family=Orbitron&family=Quicksand&family=Indie+Flower&family=Architects+Daughter&family=Exo:wght@900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <!-- Lottie Player Script -->
+  <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+  
+  <!-- CDN Import Map for Three.js -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+      }
+    }
+  </script>
+  <!-- Ionicons Script -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+    <div class="top-right-controls">
+        <a href="#" id="settingsToggleButton" class="control-button" title="Settings">
+            <i class="fas fa-cog"></i>
+        </a>
+        <div id="settingsPanel" class="settings-panel">
+            <h4 data-lang-key="settingsTitle">Settings</h4>
+            <div class="setting-item">
+                <span data-lang-key="soundLabel">Sound</span>
+                <div class="sound-controls-container">
+                    <a href="#" id="soundToggleButton" class="sound-control-button" title="Toggle Sound"><i class="fas fa-volume-mute"></i></a>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+                </div>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="zoomLabel">Zoom</span>
+                <input type="range" id="zoomSlider" min="80" max="150" step="1" value="100" title="Global Zoom">
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="darkModeLabel">Dark Mode</span>
+                <div class="dark-mode-toggle-container">
+                    <input type="checkbox" id="dark-mode-toggle-checkbox">
+                    <label for="dark-mode-toggle-checkbox" class="dark-mode-toggle-label">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </label>
+                </div>
+            </div>
+            <div class="setting-item theme-picker-container">
+                <span data-lang-key="themeLabel">Theme</span>
+                <div class="color-swatches">
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%)" style="background: linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,51,102,1) 0%, rgba(15,82,186,1) 100%)" style="background: linear-gradient(159deg, rgba(0,51,102,1) 0%, rgba(15,82,186,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(100,149,237,1) 0%, rgba(124,158,195,1) 100%)" style="background: linear-gradient(159deg, rgba(100,149,237,1) 0%, rgba(124,158,195,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%)" style="background: linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%)" style="background: linear-gradient(159deg, rgba(176,224,230,1) 0%, rgba(70,130,180,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,127,255,1) 0%, rgba(42,82,190,1) 100%)" style="background: linear-gradient(159deg, rgba(0,127,255,1) 0%, rgba(42,82,190,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(8,146,208,1) 0%, rgba(75,0,130,1) 100%)" style="background: linear-gradient(159deg, rgba(8,146,208,1) 0%, rgba(75,0,130,1) 100%);"></span>
+                    <span class="color-swatch" data-color="linear-gradient(159deg, rgba(0,84,180,1) 0%, rgba(64,224,208,1) 100%)" style="background: linear-gradient(159deg, rgba(0,84,180,1) 0%, rgba(64,224,208,1) 100%);"></span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="fontLabel">Font</span>
+                <select id="fontChanger" class="settings-select">
+                    <option value="Poppins">Poppins</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Merriweather">Merriweather</option>
+                    <option value="Caveat">Caveat</option>
+                    <option value="Pacifico">Pacifico</option>
+                    <option value="Orbitron">Orbitron</option>
+                    <option value="Quicksand">Quicksand</option>
+                    <option value="Indie Flower">Indie Flower</option>
+                    <option value="Architects Daughter">Architects Daughter</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="languageLabel">Language</span>
+                <select id="languageSelect" class="settings-select">
+                    <option value="en">English</option>
+                    <option value="fil">Filipino</option>
+                    <option value="ko">Korean</option>
+                    <option value="ja">Japanese</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="zh">Chinese</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="es">Spanish</option>
+                 </select>
+            </div>
+            <div class="setting-item">
+                <span data-lang-key="accountLabel">Account</span>
+                <button id="settingsBackToMainButton" class="logout-button" data-lang-key="settingsBackToMain">Back to Main</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="initial-page-content" class="page-container">
+        <div class="main-header-banner">
+            <h1 class="menu-title" data-lang-key="universityTitle">LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY</h1>
+            <div class="menu-subtitle-container">
+                <p class="menu-subtitle"><span data-lang-key="universitySubtitle">Integrity, Professionalism and Innovation</span></p>
+            </div>
+        </div>
+        <div class="two-panel-layout">
+            <div class="panel logo-panel">
+                <img src="image/logo.png" alt="University Logo" class="logo-image">
+            </div>
+            <div class="panel welcome-panel">
+                <div class="welcome-panel-wrapper">
+                    <h2 id="welcomeTitle" data-lang-key="welcomeTitle">Welcome</h2>
+                    <div class="welcome-animation-container">
+                        <dotlottie-player id="welcome-animation-player" src="https://lottie.host/9a8fe823-dd8c-49bc-a46f-7c45fe241538/CL2VoEqQMG.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player>
+                    </div>
+                    <p class="welcome-text" data-lang-key="welcomeText">Press continue to begin the tour.</p>
+                    <button id="enterUniversityButton" class="enter-button icon-button">
+                        <span data-lang-key="enterButton">Continue</span>
+                        <i class="fas fa-running"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="student-loading-screen" class="page-container">
+        <div class="loading-animation-container">
+            <dotlottie-player src="https://lottie.host/dd531719-0268-4adc-b249-9680a6cbfbaa/D4kDvIRBvt.lottie" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></dotlottie-player>
+            <div class="loading-text" data-lang-key="loadingTextStudent">Enrolling you into the virtual campus...</div>
+            <p class="loading-welcome-text" data-lang-key="loadingWelcomeStudent"></p>
+        </div>
+    </div>
+
+    <div id="visitor-loading-screen" class="page-container">
+        <div class="loading-animation-container">
+             <dotlottie-player src="https://lottie.host/3baab94b-bfa9-423b-8549-102bb15015e8/fB9lQBJ6bM.lottie" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></dotlottie-player>
+            <div class="loading-text" data-lang-key="loadingTextVisitor">Preparing your tour...</div>
+            <p class="loading-welcome-text" data-lang-key="loadingWelcomeVisitor"></p>
+        </div>
+    </div>
+
+    <div id="menu-page" class="page-container">
+        <div class="menu-content-wrapper">
+            <div class="menu-header">
+            <h1 class="menu-title" data-lang-key="universityTitle">LAGUNA STATE POLYTECHNIC UNIVERSITY - SAN PABLO CITY</h1>
+
+                <div class="menu-subtitle-container">
+                    <p class="menu-subtitle"><span data-lang-key="universitySubtitle">Integrity, Professionalism and Innovation</span></p>
+                </div>
+            </div>
+            <div class="hexagon-menu">
+                <a href="#" class="hexagon hexagon-welcome" id="welcomeButton"><div class="hexagon-icon"><i class="fas fa-door-open"></i></div><span class="hexagon-text" data-lang-key="menuWelcome">WELCOME</span></a>
+                <a href="#" class="hexagon" id="hexagon-3d-button"><div class="hexagon-icon"><ion-icon name="cube-sharp"></ion-icon></div><span class="hexagon-text" data-lang-key="menu3d">3D</span></a>
+                <a href="#" class="hexagon hexagon-shadowed" id="hexagon-2d-button"><div class="hexagon-icon"><i class="fas fa-map-marked-alt"></i></div><span class="hexagon-text" data-lang-key="menuMiniMap">Mini Map</span></a>
+                <a href="#" class="hexagon" id="aboutButton"><div class="hexagon-icon"><i class="fas fa-info-circle"></i></div><span class="hexagon-text" data-lang-key="menuAbout">ABOUT</span></a>
+            </div>
+            <div class="back-to-login-container">
+                <button id="backToLoginButton" class="back-to-login-button icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-lang-key="backToMainButton">Back to Main</span>
+                    <i class="fas fa-running"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-2d-page" class="page-container">
+        <div class="map-page-header">
+            <a href="#" id="backButtonFrom2D" class="map-ui-button"><i class="fas fa-arrow-left"></i> <span data-lang-key="backButton">BACK</span></a>
+            <a href="#" id="mapPageSettingsButton" class="control-button" title="Settings"><i class="fas fa-cog"></i></a>
+        </div>
+        <div class="map-area-wrapper">
+            <div id="map-content-area" class="map-content-area">
+                <img src="2dmap.png" alt="2D University Map" class="map-image-2d">
+                <!-- START: PIN LOCATIONS -->
+                <div class="pin-wrapper" id="pin-1" style="left: 506px; top: 101px; animation-delay: 0.1s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-2" style="left: 619px; top: 102px; animation-delay: 0.2s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-3" style="left: 749px; top: 102px; animation-delay: 0.3s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-4" style="left: 860px; top: 102px; animation-delay: 0.4s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-5" style="left: 741px; top: 207px; animation-delay: 0.5s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-6" style="left: 826px; top: 316px; animation-delay: 0.6s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-7" style="left: 925px; top: 182px; animation-delay: 0.7s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-8" style="left: 906px; top: 307px; animation-delay: 0.8s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-9" style="left: 504px; top: 271px; animation-delay: 0.9s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-10" style="left: 630px; top: 217px; animation-delay: 1.0s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-11" style="left: 608px; top: 292px; animation-delay: 1.1s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-12" style="left: 593px; top: 395px; animation-delay: 1.2s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-13" style="left: 513px; top: 379px; animation-delay: 1.3s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-14" style="left: 508px; top: 457px; animation-delay: 1.4s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-15" style="left: 579px; top: 505px; animation-delay: 1.5s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-16" style="left: 571px; top: 615px; animation-delay: 1.6s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-17" style="left: 574px; top: 790px; animation-delay: 1.7s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-18" style="left: 782px; top: 552px; animation-delay: 1.8s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-19" style="left: 747px; top: 475px; animation-delay: 1.9s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-20" style="left: 826px; top: 479px; animation-delay: 2.0s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-21" style="left: 958px; top: 406px; animation-delay: 2.1s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-22" style="left: 1048px; top: 434px; animation-delay: 2.2s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-23" style="left: 907px; top: 487px; animation-delay: 2.3s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-24" style="left: 1006px; top: 500px; animation-delay: 2.4s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <div class="pin-wrapper" id="pin-25" style="left: 1095px; top: 502px; animation-delay: 2.5s;"><dotlottie-player class="pin-lottie" src="https://lottie.host/dd424f98-aaa2-408f-8438-5aabc1f4e9cd/2yPv6kHU5U.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>
+                <!-- END: PIN LOCATIONS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- START: Character Selection Page -->
+    <div id="character-selection-page" class="page-container">
+        <div class="character-canvas-wrapper">
+             <div id="character-canvas-container">
+                <!-- Three.js canvas will be inserted here by script.js -->
+            </div>
+        </div>
+       
+        <div class="character-controls-bottom">
+            <button id="prev-char-btn" class="char-nav-arrow"><i class="fa-solid fa-circle-left" style="color: #63E6BE;"></i></button>
+            <button id="next-char-btn" class="char-nav-arrow"><i class="fa-solid fa-circle-right" style="color: #63E6BE;"></i></button>
+        </div>
+
+        <div class="character-side-menu-container">
+            <button id="tool-menu-toggle-btn" class="tool-menu-toggle-btn">
+                <ion-icon name="list-circle-outline"></ion-icon>
+            </button>
+            <div class="character-side-menu">
+                <button id="select-char-btn" title="Character View"><i class="fas fa-user"></i></button>
+                <button id="loadmap-btn" title="Map View"><i class="fas fa-map"></i></button>
+                <button id="char-toggle-animation-btn" title="Toggle Animation"><i class="fa-regular fa-square-check"></i></button>
+                <button id="char-fullscreen-btn" title="Toggle Fullscreen"><i class="fas fa-expand"></i></button>
+                <button id="char-back-to-menu-btn" title="Back to Menu"><i class="fas fa-reply"></i></button>
+            </div>
+        </div>
+    </div>
+    <!-- END: Character Selection Page -->
+
+    <!-- START: Main 3D Campus Page (Placeholder) -->
+    <div id="main-3d-campus-page" class="page-container">
+        <div class="campus-3d-placeholder">
+            <h1>3D Campus Environment</h1>
+            <p>The main 3D campus map will be loaded here.</p>
+            <p>Selected Character: <span id="selected-char-display">None</span></p>
+            <button id="backFrom3DCampusBtn" class="map-ui-button" style="margin-top: 20px;">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </button>
+        </div>
+    </div>
+    <!-- END: Main 3D Campus Page (Placeholder) -->
+
+    <!-- START: NEW Pin Info Popup -->
+    <div id="pin-info-popup-container" class="pin-info-popup-container">
+        <div class="pin-info-popup">
+            <div class="pin-info-icon-wrapper">
+                <i id="pin-popup-icon" class="fas"></i>
+            </div>
+            <div class="pin-info-text-wrapper">
+                <h3 id="pin-popup-title">Location Name</h3>
+            </div>
+            <div class="pin-info-button-wrapper">
+                <button id="pin-popup-next-btn" class="pin-info-next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <button id="pin-info-popup-close-btn" class="pin-info-popup-close-btn">×</button>
+        </div>
+    </div>
+    <!-- END: NEW Pin Info Popup -->
+    
+    <!-- START: NEW College Info Popup -->
+    <div id="college-info-popup-container" class="pin-info-popup-container">
+        <div class="pin-info-popup college-popup">
+            <div class="pin-info-icon-wrapper">
+                <i id="college-popup-icon" class="fas"></i>
+            </div>
+            <div class="college-info-text-wrapper">
+                <h3 id="college-popup-title">College Name</h3>
+                <div id="college-popup-details"></div>
+            </div>
+            <button id="college-info-popup-close-btn" class="pin-info-popup-close-btn">×</button>
+        </div>
+    </div>
+    <!-- END: NEW College Info Popup -->
+    
+    <div id="info-popup-container" class="info-popup-container">
+        <div class="info-popup">
+            <button id="info-popup-close-btn" class="welcome-popup-close-btn">×</button>
+            <div id="info-popup-content-wrapper">
+                <!-- Page 1: Intro -->
+                <div class="info-page active-page">
+                    <div class="info-popup-content">
+                        <div class="info-popup-image-container">
+                             <dotlottie-player src="https://lottie.host/9e295f89-0908-4590-83c5-526a1116523d/aCykuS2Lxd.lottie" background="transparent" speed="1" style="width: 250px; height: 250px" loop autoplay></dotlottie-player>
+                        </div>
+                        <div class="info-popup-text-container">
+                            <p data-lang-key="aboutIntro"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Page 2: Objectives -->
+                <div class="info-page">
+                     <div class="info-popup-content-full">
+                        <h2 data-lang-key="aboutObjectivesTitle"></h2>
+                        <p data-lang-key="aboutObjectivesText"></p>
+                    </div>
+                </div>
+                <!-- Page 3: Key Features -->
+                <div class="info-page">
+                    <div class="info-popup-content-full">
+                        <h2 data-lang-key="aboutFeaturesTitle"></h2>
+                        <p data-lang-key="aboutFeaturesText"></p>
+                    </div>
+                </div>
+                <!-- Page 4: Developers -->
+                <div class="info-page">
+                    <div class="info-popup-content-full">
+                        <h2 data-lang-key="aboutDevsTitle"></h2>
+                        <p data-lang-key="aboutDevsIntro"></p>
+                        <div class="developer-grid">
+                            <div class="developer-card">
+                                <img src="image/pic1.png" alt="Developer 1">
+                                <span>Endrenal, Danniele Anne V.</span>
+                            </div>
+                            <div class="developer-card">
+                                <img src="image/pic2.png" alt="Developer 2">
+                                <span>Nguyen Kim</span>
+                            </div>
+                            <div class="developer-card">
+                                <img src="image/pic3.png" alt="Developer 3">
+                                <span>Alejandro John Zymon.</span>
+                            </div>
+                            <div class="developer-card">
+                                <img src="image/pic4.png" alt="Developer 4">
+                                <span>Sedric Dimasapit.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-popup-nav">
+                 <button id="info-popup-prev-btn" class="welcome-popup-nav-btn">
+                    <i class="fas fa-arrow-left"></i>
+                 </button>
+                 <button id="info-popup-next-btn" class="welcome-popup-nav-btn">
+                    <i class="fas fa-arrow-right"></i>
+                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message-popup-container" class="message-popup-container" style="display: none;">
+        <div class="message-popup">
+            <div class="popup-icon-circle">
+                <i class="fas fa-map-marker-alt location-icon"></i>
+            </div>
+            <h2 class="message-popup-title" data-lang-key="popupNoticeTitle">Notice</h2>
+            <p class="message-popup-text" data-lang-key="popupFeatureComingSoon">This feature is coming soon!</p>
+            <button class="message-popup-button" data-lang-key="popupOkButton">OK</button>
+        </div>
+    </div>
+
+    <!-- START: Welcome Popup -->
+    <div id="welcome-popup-container" class="welcome-popup-container">
+        <div class="welcome-popup">
+            <button id="welcome-popup-close-btn" class="welcome-popup-close-btn">×</button>
+            <div id="welcome-popup-content-wrapper">
+                <!-- Page 1: History -->
+                <div id="welcome-page-1" class="welcome-page">
+                    <div class="welcome-popup-content">
+                        <div class="welcome-popup-image-container history-logos">
+                            <img src="image/logo1.png" alt="LSPU Seal">
+                            <img src="image/logo2.png" alt="CCS Logo">
+                        </div>
+                        <div class="welcome-popup-text-container">
+                            <p data-lang-key="welcomeHistory1"></p>
+                            <p data-lang-key="welcomeHistory2"></p>
+                            <p data-lang-key="welcomeHistory3"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Page 2: Mission/Vision -->
+                <div id="welcome-page-2" class="welcome-page">
+                    <div class="welcome-popup-content">
+                         <div class="welcome-popup-image-container">
+                            <dotlottie-player src="https://lottie.host/52ab20c7-1716-49b0-8c4c-7b49ca43e189/dlJhDbY5gY.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player>
+                        </div>
+                        <div class="welcome-popup-text-container">
+                            <h2 data-lang-key="welcomePopupMVTitle">Mission & Vision</h2>
+                            <h3 data-lang-key="welcomePopupMissionTitle">MISSION</h3>
+                            <p data-lang-key="welcomePopupMissionText"></p>
+                            <h3 data-lang-key="welcomePopupVisionTitle">VISION</h3>
+                            <p data-lang-key="welcomePopupVisionText"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-popup-nav">
+                 <button id="welcome-popup-prev-btn" class="welcome-popup-nav-btn">
+                    <i class="fas fa-arrow-left"></i>
+                 </button>
+                 <button id="welcome-popup-next-btn" class="welcome-popup-nav-btn">
+                    <i class="fas fa-arrow-right"></i>
+                 </button>
+            </div>
+        </div>
+    </div>
+    <!-- END: Welcome Popup -->
+
+    <audio id="backgroundMusic" loop src="lspu.mp3"></audio>
+
+    
+    <script type="module" src="js/script.js"></script>
+
+</body>
+</html>
